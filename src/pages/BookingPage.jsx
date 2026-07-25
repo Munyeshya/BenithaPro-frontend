@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  Calendar, Clock, User, Phone, Mail, MapPin, 
-  CreditCard, Upload, CheckCircle2, AlertCircle, 
-  ArrowRight, ArrowLeft, Loader2, Sparkles, MessageCircle 
+  Calendar, Clock, User, CreditCard, Upload, 
+  CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, 
+  Loader2, Sparkles, MessageCircle 
 } from 'lucide-react';
 import API from '../services/api';
 import CalendarPicker from '../components/CalendarPicker';
-const [availableRanges, setAvailableRanges] = useState([]);
-const [blockedRanges, setBlockedRanges] = useState([]);
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
@@ -23,6 +21,10 @@ export default function BookingPage() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [fullBlockedDates, setFullBlockedDates] = useState([]);
   const [partiallyBlockedDates, setPartiallyBlockedDates] = useState([]);
+  const [timelineSegments, setTimelineSegments] = useState([]);
+  const [allSlots, setAllSlots] = useState([]);
+  const [openingTime, setOpeningTime] = useState('');
+  const [closingTime, setClosingTime] = useState(''); 
 
   // Package Selection State
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -31,6 +33,8 @@ export default function BookingPage() {
   // Date & Time Selection State
   const [appointmentDate, setAppointmentDate] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [availableRanges, setAvailableRanges] = useState([]);
+  const [blockedRanges, setBlockedRanges] = useState([]);
   const [selectedTime, setSelectedTime] = useState('');
   const [checkingSlots, setCheckingSlots] = useState(false);
   const [slotError, setSlotError] = useState('');
@@ -60,39 +64,38 @@ export default function BookingPage() {
     fetchInitialData();
   }, []);
 
-  // Change fetchInitialData inside BookingPage.jsx to:
-const fetchInitialData = async () => {
-  try {
-    const [catRes, payRes, blockRes] = await Promise.all([
-      API.get('/categories-packages/'),
-      API.get('/payment-methods/'),
-      API.get('/blocked-periods/')
-    ]);
+  const fetchInitialData = async () => {
+    try {
+      const [catRes, payRes, blockRes] = await Promise.all([
+        API.get('/categories-packages/'),
+        API.get('/payment-methods/'),
+        API.get('/blocked-periods/').catch(() => ({ data: [] }))
+      ]);
 
-    setCategories(catRes.data);
-    setPaymentMethods(payRes.data);
+      setCategories(catRes.data);
+      setPaymentMethods(payRes.data);
 
-    if (blockRes.data && Array.isArray(blockRes.data)) {
-      const full = blockRes.data.filter(b => b.block_full_day).map(b => b.blocked_date);
-      const partial = blockRes.data.filter(b => !b.block_full_day).map(b => b.blocked_date);
-      setFullBlockedDates(full);
-      setPartiallyBlockedDates(partial);
-    }
+      if (blockRes.data && Array.isArray(blockRes.data)) {
+        const full = blockRes.data.filter(b => b.block_full_day).map(b => b.blocked_date);
+        const partial = blockRes.data.filter(b => !b.block_full_day).map(b => b.blocked_date);
+        setFullBlockedDates(full);
+        setPartiallyBlockedDates(partial);
+      }
 
-    if (preselectedPackageId && catRes.data.length > 0) {
-      for (const cat of catRes.data) {
-        const found = cat.packages.find(p => p.id === parseInt(preselectedPackageId));
-        if (found) {
-          setSelectedCategory(cat.id);
-          setSelectedPackage(found);
-          break;
+      if (preselectedPackageId && catRes.data.length > 0) {
+        for (const cat of catRes.data) {
+          const found = cat.packages.find(p => p.id === parseInt(preselectedPackageId));
+          if (found) {
+            setSelectedCategory(cat.id);
+            setSelectedPackage(found);
+            break;
+          }
         }
       }
+    } catch (err) {
+      console.error('Error fetching booking setup data:', err);
     }
-  } catch (err) {
-    console.error('Error fetching booking setup data:', err);
-  }
-};
+  };
 
   // Fetch Available Hours when Date or Package changes
   useEffect(() => {
@@ -101,31 +104,32 @@ const fetchInitialData = async () => {
     }
   }, [appointmentDate, selectedPackage]);
 
- const fetchAvailableSlots = async () => {
+  const fetchAvailableSlots = async () => {
   try {
     setCheckingSlots(true);
     setSlotError('');
     setSelectedTime('');
+    
     const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
     
-    setAvailableSlots(res.data.available_slots || []);
-    setAvailableRanges(res.data.available_ranges || []);
-    setBlockedRanges(res.data.blocked_ranges || []);
+    setTimelineSegments(res.data.timeline_segments || []);
+    setAllSlots(res.data.all_slots || []);
+    setOpeningTime(res.data.opening_time || '');
+    setClosingTime(res.data.closing_time || '');
 
     if (!res.data.available && res.data.reason) {
       setSlotError(res.data.reason);
     }
   } catch (err) {
-    setAvailableSlots([]);
-    setAvailableRanges([]);
-    setBlockedRanges([]);
+    setTimelineSegments([]);
+    setAllSlots([]);
     setSlotError('Unable to check slot availability for this date.');
   } finally {
     setCheckingSlots(false);
   }
 };
 
-// 3. Update Step 2 JSX in BookingPage.jsx:
+// STEP 2 JSX RENDER:
 {currentStep === 2 && (
   <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
     <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
@@ -142,7 +146,7 @@ const fetchInitialData = async () => {
 
     {checkingSlots && (
       <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
-        <Loader2 className="animate-spin" size={16} /> Checking availability for {appointmentDate}...
+        <Loader2 className="animate-spin" size={16} /> Loading studio schedule...
       </div>
     )}
 
@@ -150,74 +154,89 @@ const fetchInitialData = async () => {
       <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200">
         <AlertCircle size={18} className="shrink-0" />
         <div>
-          <strong className="block font-bold">Notice</strong>
+          <strong className="block font-bold">Closed / Fully Booked</strong>
           <span>{slotError}</span>
         </div>
       </div>
     )}
 
-    {!checkingSlots && (availableSlots.length > 0 || blockedRanges.length > 0) && (
+    {!checkingSlots && timelineSegments.length > 0 && (
       <div className="space-y-6 pt-2">
         
-        {/* GREEN BADGES: AVAILABLE HOUR RANGES & TIME SLOTS */}
-        {availableRanges.length > 0 && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs uppercase tracking-wider">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span>Available Hour Windows ({appointmentDate})</span>
-            </div>
+        {/* 1. VISUAL PROPORTIONAL WORKING HOURS TIMELINE BAR */}
+        <div className="bg-luxury-cream p-5 rounded-3xl border border-luxury-nude space-y-3">
+          <div className="flex justify-between items-center text-xs font-bold text-luxury-black">
+            <span className="uppercase tracking-wider">Working Hours Overview</span>
+            <span className="font-mono text-gray-500">{openingTime} - {closingTime}</span>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {availableRanges.map((range, idx) => (
-                <div key={idx} className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                  <span className="text-[10px] uppercase font-bold text-emerald-700 block">Open Window</span>
-                  <p className="font-serif text-base font-bold text-emerald-900 font-mono mt-0.5">{range.label}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Start Time Selectors inside Open Windows */}
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-gray-700 mb-2">Select Your Preferred Start Time:</label>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                {availableSlots.map((slotObj) => (
-                  <button
-                    key={slotObj.start}
-                    type="button"
-                    onClick={() => setSelectedTime(slotObj.start)}
-                    className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center justify-center gap-1 ${
-                      selectedTime === slotObj.start 
-                        ? 'bg-emerald-600 text-white shadow-lg scale-105 ring-2 ring-emerald-400' 
-                        : 'bg-emerald-100/70 text-emerald-900 hover:bg-emerald-200 border border-emerald-300'
-                    }`}
-                  >
-                    <Clock size={12} /> {slotObj.start}
-                  </button>
-                ))}
+          {/* Continuous Multi-Color Bar */}
+          <div className="w-full h-8 bg-gray-200 rounded-2xl overflow-hidden flex shadow-inner p-1 gap-1">
+            {timelineSegments.map((seg, idx) => (
+              <div
+                key={idx}
+                style={{ width: `${seg.width_percent}%` }}
+                title={`${seg.label} (${seg.reason})`}
+                className={`h-full rounded-xl transition-all flex items-center justify-center text-[10px] font-bold text-white font-mono px-1 overflow-hidden truncate ${
+                  seg.type === 'available'
+                    ? 'bg-emerald-500 shadow-sm'
+                    : seg.type === 'blocked'
+                    ? 'bg-amber-400 text-amber-950 shadow-sm'
+                    : 'bg-red-800 shadow-sm'
+                }`}
+              >
+                {seg.width_percent > 15 && seg.label}
               </div>
+            ))}
+          </div>
+
+          {/* Timeline Bar Legend */}
+          <div className="flex flex-wrap justify-center gap-4 text-[10px] pt-1">
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
+              <span className="font-semibold text-gray-700">Available Range</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-md bg-amber-400"></span>
+              <span className="font-semibold text-gray-700">Blocked Range / Break</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-md bg-red-800"></span>
+              <span className="font-semibold text-gray-700">Booked</span>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* YELLOW / AMBER BADGES: BLOCKED HOUR RANGES */}
-        {blockedRanges.length > 0 && (
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span>Blocked / Unavailable Windows</span>
-            </div>
+        {/* 2. INDIVIDUAL TIME SLOTS SELECTOR */}
+        {allSlots.length > 0 && (
+          <div className="space-y-3">
+            <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black">
+              Select Your Appointment Start Time ({appointmentDate})
+            </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {blockedRanges.map((block, idx) => (
-                <div key={idx} className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex justify-between items-center text-xs">
-                  <div>
-                    <p className="font-bold text-amber-900 font-mono text-sm">{block.label}</p>
-                    <p className="text-[10px] text-amber-700 mt-0.5">{block.reason}</p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+              {allSlots.map((slotObj) => (
+                <button
+                  key={slotObj.time}
+                  type="button"
+                  disabled={!slotObj.is_available}
+                  onClick={() => setSelectedTime(slotObj.time)}
+                  className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex flex-col items-center justify-center gap-0.5 ${
+                    !slotObj.is_available
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed line-through opacity-70'
+                      : selectedTime === slotObj.time
+                      ? 'bg-luxury-black text-luxury-gold shadow-lg scale-105 ring-2 ring-luxury-gold'
+                      : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border border-emerald-300'
+                  }`}
+                  title={slotObj.is_available ? 'Available' : slotObj.reason}
+                >
+                  <div className="flex items-center gap-1">
+                    <Clock size={12} /> {slotObj.time}
                   </div>
-                  <span className="text-[10px] font-bold uppercase bg-amber-200 text-amber-900 px-2 py-1 rounded-lg">
-                    Blocked
-                  </span>
-                </div>
+                  {!slotObj.is_available && (
+                    <span className="text-[8px] no-underline font-sans text-red-500">Blocked</span>
+                  )}
+                </button>
               ))}
             </div>
           </div>
@@ -245,6 +264,8 @@ const fetchInitialData = async () => {
     </div>
   </div>
 )}
+
+  // STEP 3 JSX RENDER: 
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -279,7 +300,7 @@ const fetchInitialData = async () => {
       data.append('appointment_date', appointmentDate);
       data.append('start_time', selectedTime);
       data.append('deposit_paid', formData.deposit_paid);
-      data.append('amount_paid', formData.amount_paid || selectedPackage.price * 0.3); // Default 30% deposit
+      data.append('amount_paid', formData.amount_paid || selectedPackage.price * 0.3);
       if (formData.payment_method) {
         data.append('payment_method', formData.payment_method);
       }
@@ -293,7 +314,7 @@ const fetchInitialData = async () => {
       });
 
       setCreatedAppointment(response.data);
-      setCurrentStep(5); // Advance to Confirmation Step
+      setCurrentStep(5);
     } catch (err) {
       console.error('Submission failed:', err);
       setSubmitError(err.response?.data?.error || 'Failed to submit appointment. Please try again.');
@@ -306,7 +327,7 @@ const fetchInitialData = async () => {
     <div className="pt-28 pb-24 bg-luxury-cream min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Page Title Header */}
+        {/* Page Header */}
         <div className="text-center mb-8">
           <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">Seamless Online Reservation</span>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-luxury-black mt-1">
@@ -314,7 +335,7 @@ const fetchInitialData = async () => {
           </h1>
         </div>
 
-        {/* Multi-Step Progress Tracker */}
+        {/* Multi-Step Tracker */}
         {currentStep <= 4 && (
           <div className="flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
             {[
@@ -347,7 +368,7 @@ const fetchInitialData = async () => {
         {currentStep === 1 && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <Sparkles size={18} className="text-luxury-gold" /> Step 1: Select Service Category & Package
+              <Sparkles size={18} className="text-luxury-gold" /> Step 1: Select Category & Package
             </h2>
 
             <div>
@@ -413,14 +434,13 @@ const fetchInitialData = async () => {
           </div>
         )}
 
-        {/* STEP 2: INTERACTIVE CALENDAR & TIME SLOT SELECTION */}
+        {/* STEP 2: CALENDAR & TIME WINDOW SELECTION */}
         {currentStep === 2 && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Available Date & Time Slot
+              <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Time Window
             </h2>
 
-            {/* Interactive Calendar Component */}
             <CalendarPicker
               selectedDate={appointmentDate}
               onSelectDate={(date) => setAppointmentDate(date)}
@@ -430,41 +450,86 @@ const fetchInitialData = async () => {
 
             {checkingSlots && (
               <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
-                <Loader2 className="animate-spin" size={16} /> Checking available hours for {appointmentDate}...
+                <Loader2 className="animate-spin" size={16} /> Checking availability for {appointmentDate}...
               </div>
             )}
 
             {slotError && (
-              <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200 shadow-sm">
+              <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200">
                 <AlertCircle size={18} className="shrink-0" />
                 <div>
-                  <strong className="block font-bold">Date Blocked or Closed</strong>
+                  <strong className="block font-bold">Notice</strong>
                   <span>{slotError}</span>
                 </div>
               </div>
             )}
 
-            {!checkingSlots && availableSlots.length > 0 && (
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-3">
-                  Available Hours for {appointmentDate}
-                </label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {availableSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => setSelectedTime(slot)}
-                      className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-                        selectedTime === slot 
-                          ? 'bg-luxury-black text-luxury-gold shadow-md scale-105' 
-                          : 'bg-luxury-cream text-gray-800 hover:bg-luxury-nude border border-luxury-nude'
-                      }`}
-                    >
-                      <Clock size={12} /> {slot}
-                    </button>
-                  ))}
-                </div>
+            {!checkingSlots && (availableSlots.length > 0 || blockedRanges.length > 0) && (
+              <div className="space-y-6 pt-2">
+                
+                {/* GREEN: AVAILABLE RANGES & SLOTS */}
+                {availableRanges.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs uppercase tracking-wider">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                      <span>Available Hour Windows ({appointmentDate})</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {availableRanges.map((range, idx) => (
+                        <div key={idx} className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                          <span className="text-[10px] uppercase font-bold text-emerald-700 block">Open Window</span>
+                          <p className="font-serif text-base font-bold text-emerald-900 font-mono mt-0.5">{range.label}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="pt-2">
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">Select Your Preferred Start Time:</label>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                        {availableSlots.map((slotObj) => (
+                          <button
+                            key={slotObj.start}
+                            type="button"
+                            onClick={() => setSelectedTime(slotObj.start)}
+                            className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center justify-center gap-1 ${
+                              selectedTime === slotObj.start 
+                                ? 'bg-emerald-600 text-white shadow-lg scale-105 ring-2 ring-emerald-400' 
+                                : 'bg-emerald-100/70 text-emerald-900 hover:bg-emerald-200 border border-emerald-300'
+                            }`}
+                          >
+                            <Clock size={12} /> {slotObj.start}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* YELLOW: BLOCKED RANGES */}
+                {blockedRanges.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                      <span>Blocked / Unavailable Windows</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {blockedRanges.map((block, idx) => (
+                        <div key={idx} className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex justify-between items-center text-xs">
+                          <div>
+                            <p className="font-bold text-amber-900 font-mono text-sm">{block.label}</p>
+                            <p className="text-[10px] text-amber-700 mt-0.5">{block.reason}</p>
+                          </div>
+                          <span className="text-[10px] font-bold uppercase bg-amber-200 text-amber-900 px-2 py-1 rounded-lg">
+                            Blocked
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </div>
             )}
 
@@ -488,7 +553,7 @@ const fetchInitialData = async () => {
           </div>
         )}
 
-        {/* STEP 3: PERSONAL DETAILS FORM */}
+        {/* STEP 3: PERSONAL DETAILS */}
         {currentStep === 3 && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-5">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
@@ -607,14 +672,13 @@ const fetchInitialData = async () => {
           </div>
         )}
 
-        {/* STEP 4: PAYMENT & DEPOSIT PROOF UPLOAD */}
+        {/* STEP 4: PAYMENT & PROOF UPLOAD */}
         {currentStep === 4 && (
           <form onSubmit={handleSubmitBooking} className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
               <CreditCard size={18} className="text-luxury-gold" /> Step 4: Deposit Payment & Proof Upload
             </h2>
 
-            {/* Price & Deposit Summary */}
             <div className="bg-luxury-cream p-4 rounded-2xl border border-luxury-nude text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-500">Selected Package:</span>
@@ -632,7 +696,6 @@ const fetchInitialData = async () => {
               </div>
             </div>
 
-            {/* Payment Method Selector */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Select Payment Option</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -653,7 +716,6 @@ const fetchInitialData = async () => {
               </div>
             </div>
 
-            {/* Deposit Amount Input */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Amount Deposited (Frw)</label>
               <input
@@ -666,7 +728,6 @@ const fetchInitialData = async () => {
               />
             </div>
 
-            {/* File Upload Box */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Upload Payment Slip / Screenshot Proof</label>
               <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl text-center hover:border-luxury-gold transition-colors">
@@ -747,7 +808,6 @@ const fetchInitialData = async () => {
               </div>
             </div>
 
-            {/* WhatsApp Deep Link Button */}
             {createdAppointment.whatsapp_url && (
               <a
                 href={createdAppointment.whatsapp_url}
