@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Calendar, CheckCircle, Clock, DollarSign, 
+  Calendar as CalendarIcon, Clock, DollarSign, 
   Eye, FileText, Filter, RefreshCw, 
   ShieldCheck, XCircle, Download, Loader2,
-  Lock, Settings, Plus, Trash2, AlertCircle
+  Lock, Settings, Plus, Trash2, Ban
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
+import CalendarPicker from '../components/CalendarPicker';
 
 export default function AdminDashboardPage() {
   const { isAuthenticated, admin } = useAuth();
@@ -30,12 +31,16 @@ export default function AdminDashboardPage() {
   const [blockedPeriods, setBlockedPeriods] = useState([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
-  // New Block Form State
+  // Admin Selected Date on Calendar
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+
+  // Multi-Range Block Form State for Selected Date
   const [newBlock, setNewBlock] = useState({
-    blocked_date: '',
-    start_time: '08:00',
-    end_time: '18:00',
-    block_full_day: true,
+    start_time: '09:00',
+    end_time: '12:00',
+    block_full_day: false,
     reason: ''
   });
 
@@ -98,24 +103,38 @@ export default function AdminDashboardPage() {
 
   const handleAddBlockedPeriod = async (e) => {
     e.preventDefault();
+    if (!selectedCalendarDate) {
+      alert('Please click and select a date on the calendar first.');
+      return;
+    }
+
     try {
-      await API.post('/admin/blocked-periods/', newBlock);
+      const payload = {
+        blocked_date: selectedCalendarDate,
+        block_full_day: newBlock.block_full_day,
+        reason: newBlock.reason,
+        ...(newBlock.block_full_day ? {} : {
+          start_time: newBlock.start_time,
+          end_time: newBlock.end_time
+        })
+      };
+
+      await API.post('/admin/blocked-periods/', payload);
       setNewBlock({
-        blocked_date: '',
-        start_time: '08:00',
-        end_time: '18:00',
-        block_full_day: true,
+        start_time: '09:00',
+        end_time: '12:00',
+        block_full_day: false,
         reason: ''
       });
       fetchScheduleData();
     } catch (err) {
       console.error('Failed to add blocked period:', err);
-      alert(err.response?.data?.error || 'Failed to block date.');
+      alert(err.response?.data?.error || 'Failed to block date/time range.');
     }
   };
 
   const handleDeleteBlockedPeriod = async (id) => {
-    if (!window.confirm('Are you sure you want to unblock this period?')) return;
+    if (!window.confirm('Are you sure you want to unblock this range?')) return;
     try {
       await API.delete(`/admin/blocked-periods/${id}/`);
       fetchScheduleData();
@@ -160,6 +179,13 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Filter blocked records for the currently selected date on calendar
+  const selectedDateBlocks = blockedPeriods.filter(
+    b => b.blocked_date === selectedCalendarDate
+  );
+
+  const allBlockedDates = Array.from(new Set(blockedPeriods.map(b => b.blocked_date)));
+
   return (
     <div className="pt-28 pb-24 bg-luxury-cream min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -196,7 +222,7 @@ export default function AdminDashboardPage() {
                 <h3 className="font-serif text-2xl font-bold text-luxury-black mt-1">{stats.total_appointments}</h3>
               </div>
               <div className="w-10 h-10 bg-luxury-cream text-luxury-black rounded-xl flex items-center justify-center">
-                <Calendar size={20} />
+                <CalendarIcon size={20} />
               </div>
             </div>
 
@@ -254,7 +280,7 @@ export default function AdminDashboardPage() {
                 : 'border-transparent text-gray-400 hover:text-luxury-black'
             }`}
           >
-            <Settings size={16} /> Working Hours & Blocked Dates
+            <Settings size={16} /> Working Hours & Calendar Schedule
           </button>
         </div>
 
@@ -360,177 +386,201 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* TAB 2: SCHEDULE & BLOCKED PERIODS MANAGEMENT */}
+        {/* TAB 2: SCHEDULE & CALENDAR MANAGEMENT */}
         {activeTab === 'schedule' && (
           <div className="space-y-8">
             
-            {/* Operating Hours Settings */}
+            {/* 1. WEEKLY OPERATING HOURS */}
             <div className="bg-white p-6 rounded-3xl border border-luxury-nude shadow-sm space-y-4">
               <h2 className="font-serif text-lg font-bold text-luxury-black flex items-center gap-2">
                 <Clock size={18} className="text-luxury-gold" /> Weekly Operating Hours
               </h2>
-              <p className="text-xs text-gray-500">Configure studio opening/closing times and daily appointment capacities.</p>
 
               {scheduleLoading ? (
                 <div className="p-6 text-center text-xs text-gray-400">Loading working schedule...</div>
               ) : (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {schedules.map((item) => (
-                    <div key={item.id} className="p-4 bg-luxury-cream/50 rounded-2xl border border-luxury-nude flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs">
-                      <div className="w-32 font-bold text-luxury-black flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={item.is_available}
-                          onChange={(e) => {
-                            const updated = { ...item, is_available: e.target.checked };
-                            handleUpdateSchedule(updated);
-                          }}
-                          className="rounded text-luxury-gold focus:ring-luxury-gold"
-                        />
-                        <span>{item.day_name}</span>
+                    <div key={item.id} className="p-3.5 bg-luxury-cream/50 rounded-2xl border border-luxury-nude space-y-2 text-xs">
+                      <div className="font-bold text-luxury-black flex items-center justify-between">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={item.is_available}
+                            onChange={(e) => {
+                              const updated = { ...item, is_available: e.target.checked };
+                              handleUpdateSchedule(updated);
+                            }}
+                            className="rounded text-luxury-gold focus:ring-luxury-gold"
+                          />
+                          <span>{item.day_name}</span>
+                        </label>
+                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${item.is_available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                          {item.is_available ? 'Open' : 'Closed'}
+                        </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-3">
+                      <div className="grid grid-cols-2 gap-2 text-[11px]">
                         <div>
-                          <label className="block text-[10px] text-gray-400">Opening</label>
+                          <span className="text-gray-400 block text-[10px]">Opening</span>
                           <input
                             type="time"
                             value={item.opening_time}
                             onChange={(e) => item.opening_time = e.target.value}
-                            className="p-1.5 border rounded-lg text-xs"
+                            className="w-full p-1 border rounded-lg text-xs"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] text-gray-400">Closing</label>
+                          <span className="text-gray-400 block text-[10px]">Closing</span>
                           <input
                             type="time"
                             value={item.closing_time}
                             onChange={(e) => item.closing_time = e.target.value}
-                            className="p-1.5 border rounded-lg text-xs"
+                            className="w-full p-1 border rounded-lg text-xs"
                           />
                         </div>
-                        <div>
-                          <label className="block text-[10px] text-gray-400">Max Appts</label>
-                          <input
-                            type="number"
-                            value={item.maximum_appointments}
-                            onChange={(e) => item.maximum_appointments = parseInt(e.target.value)}
-                            className="p-1.5 border rounded-lg text-xs w-16"
-                          />
-                        </div>
-                        <button
-                          onClick={() => handleUpdateSchedule(item)}
-                          className="mt-3.5 bg-luxury-black text-white hover:bg-luxury-gold hover:text-luxury-black px-3 py-1.5 rounded-xl font-bold text-[11px] transition-colors"
-                        >
-                          Save
-                        </button>
                       </div>
+
+                      <button
+                        onClick={() => handleUpdateSchedule(item)}
+                        className="w-full mt-1 bg-luxury-black text-white hover:bg-luxury-gold hover:text-luxury-black py-1.5 rounded-xl font-bold text-[10px] transition-colors"
+                      >
+                        Save {item.day_name} Settings
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Blocked Dates & Range Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              
-              {/* Add Block Form */}
-              <form onSubmit={handleAddBlockedPeriod} className="lg:col-span-5 bg-white p-6 rounded-3xl border border-luxury-nude shadow-sm space-y-4">
-                <h3 className="font-serif text-base font-bold text-luxury-black flex items-center gap-2">
-                  <Lock size={16} className="text-luxury-gold" /> Block Date / Hours
-                </h3>
+            {/* 2. CALENDAR-BASED MULTI-RANGE BLOCKED PERIOD MANAGEMENT */}
+            <div className="bg-white p-6 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
+              <div>
+                <h2 className="font-serif text-lg font-bold text-luxury-black flex items-center gap-2">
+                  <CalendarIcon size={18} className="text-luxury-gold" /> Calendar Date & Hour Range Block Control
+                </h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  Click a date on the calendar below to view or add multiple custom blocked hour ranges for that day.
+                </p>
+              </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Blocked Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={newBlock.blocked_date}
-                    onChange={(e) => setNewBlock({ ...newBlock, blocked_date: e.target.value })}
-                    className="w-full p-2.5 border rounded-xl text-xs focus:ring-2 focus:ring-luxury-gold"
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Visual Calendar */}
+                <div className="lg:col-span-6">
+                  <CalendarPicker
+                    selectedDate={selectedCalendarDate}
+                    onSelectDate={(date) => setSelectedCalendarDate(date)}
+                    blockedDates={allBlockedDates}
                   />
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="block_full_day"
-                    checked={newBlock.block_full_day}
-                    onChange={(e) => setNewBlock({ ...newBlock, block_full_day: e.target.checked })}
-                    className="rounded text-luxury-gold focus:ring-luxury-gold"
-                  />
-                  <label htmlFor="block_full_day" className="text-xs font-semibold text-gray-700">Block Entire Day</label>
-                </div>
-
-                {!newBlock.block_full_day && (
-                  <div className="grid grid-cols-2 gap-3">
+                {/* Selected Date Block Controls */}
+                <div className="lg:col-span-6 space-y-6 bg-luxury-cream p-6 rounded-3xl border border-luxury-nude">
+                  <div className="flex justify-between items-center border-b border-luxury-nude pb-3">
                     <div>
-                      <label className="block text-[11px] text-gray-500 mb-1">Start Time</label>
-                      <input
-                        type="time"
-                        value={newBlock.start_time}
-                        onChange={(e) => setNewBlock({ ...newBlock, start_time: e.target.value })}
-                        className="w-full p-2 border rounded-xl text-xs"
-                      />
+                      <span className="text-[10px] uppercase font-bold text-luxury-gold tracking-widest">Selected Date</span>
+                      <h3 className="font-serif text-lg font-bold text-luxury-black">{selectedCalendarDate}</h3>
                     </div>
-                    <div>
-                      <label className="block text-[11px] text-gray-500 mb-1">End Time</label>
+                    <span className="text-xs bg-luxury-black text-white px-3 py-1 rounded-full font-mono font-bold">
+                      {selectedDateBlocks.length} Range Block(s)
+                    </span>
+                  </div>
+
+                  {/* Add Multi-Range Form for Selected Date */}
+                  <form onSubmit={handleAddBlockedPeriod} className="space-y-4">
+                    <h4 className="font-bold text-xs uppercase tracking-wider text-luxury-black flex items-center gap-1.5">
+                      <Lock size={14} className="text-luxury-gold" /> Add Blocked Range for {selectedCalendarDate}
+                    </h4>
+
+                    <div className="flex items-center gap-2">
                       <input
-                        type="time"
-                        value={newBlock.end_time}
-                        onChange={(e) => setNewBlock({ ...newBlock, end_time: e.target.value })}
-                        className="w-full p-2 border rounded-xl text-xs"
+                        type="checkbox"
+                        id="block_full_day_admin"
+                        checked={newBlock.block_full_day}
+                        onChange={(e) => setNewBlock({ ...newBlock, block_full_day: e.target.checked })}
+                        className="rounded text-luxury-gold focus:ring-luxury-gold"
                       />
+                      <label htmlFor="block_full_day_admin" className="text-xs font-semibold text-gray-700">
+                        Block Entire Day ({selectedCalendarDate})
+                      </label>
                     </div>
-                  </div>
-                )}
 
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Reason (Optional)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Public Holiday, Studio Maintenance"
-                    value={newBlock.reason}
-                    onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
-                    className="w-full p-2.5 border rounded-xl text-xs focus:ring-2 focus:ring-luxury-gold"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-luxury-black hover:bg-luxury-gold text-white hover:text-luxury-black font-bold text-xs uppercase py-3 rounded-2xl transition-all flex items-center justify-center gap-1.5 shadow"
-                >
-                  <Plus size={14} /> Add Blocked Period
-                </button>
-              </form>
-
-              {/* Blocked List */}
-              <div className="lg:col-span-7 bg-white p-6 rounded-3xl border border-luxury-nude shadow-sm space-y-4">
-                <h3 className="font-serif text-base font-bold text-luxury-black">Active Blocked Dates</h3>
-
-                {blockedPeriods.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-gray-400 bg-gray-50 rounded-2xl border border-dashed">
-                    No active blocked periods. All working days are open according to weekly schedule.
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {blockedPeriods.map((block) => (
-                      <div key={block.id} className="p-3.5 bg-red-50/50 rounded-2xl border border-red-100 flex items-center justify-between text-xs">
+                    {!newBlock.block_full_day && (
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <p className="font-bold text-red-900">{block.blocked_date} {block.block_full_day ? '(Full Day)' : `(${block.start_time} - ${block.end_time})`}</p>
-                          <p className="text-[11px] text-red-700/80 mt-0.5">{block.reason || 'No reason provided'}</p>
+                          <label className="block text-[10px] text-gray-500 mb-1 font-semibold">Start Hour</label>
+                          <input
+                            type="time"
+                            value={newBlock.start_time}
+                            onChange={(e) => setNewBlock({ ...newBlock, start_time: e.target.value })}
+                            className="w-full p-2 border rounded-xl text-xs bg-white"
+                          />
                         </div>
-                        <button
-                          onClick={() => handleDeleteBlockedPeriod(block.id)}
-                          className="p-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-xl transition-colors"
-                          title="Remove Block"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div>
+                          <label className="block text-[10px] text-gray-500 mb-1 font-semibold">End Hour</label>
+                          <input
+                            type="time"
+                            value={newBlock.end_time}
+                            onChange={(e) => setNewBlock({ ...newBlock, end_time: e.target.value })}
+                            className="w-full p-2 border rounded-xl text-xs bg-white"
+                          />
+                        </div>
                       </div>
-                    ))}
+                    )}
+
+                    <div>
+                      <label className="block text-[10px] text-gray-500 mb-1 font-semibold">Block Reason / Event Note</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Lunch Break, Studio Photo Shoot, Holiday"
+                        value={newBlock.reason}
+                        onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
+                        className="w-full p-2.5 border rounded-xl text-xs bg-white focus:ring-2 focus:ring-luxury-gold"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full bg-luxury-black hover:bg-luxury-gold text-white hover:text-luxury-black font-bold text-xs uppercase py-3 rounded-2xl transition-all flex items-center justify-center gap-1.5 shadow"
+                    >
+                      <Plus size={14} /> Add Blocked Window to {selectedCalendarDate}
+                    </button>
+                  </form>
+
+                  {/* List of Blocked Ranges on Selected Date */}
+                  <div className="pt-4 border-t border-luxury-nude space-y-2.5">
+                    <h4 className="font-bold text-xs text-luxury-black uppercase tracking-wider">
+                      Active Blocks on {selectedCalendarDate}
+                    </h4>
+
+                    {selectedDateBlocks.length === 0 ? (
+                      <p className="text-xs text-gray-400 italic bg-white p-4 rounded-2xl border text-center">
+                        No custom hours blocked for this date yet.
+                      </p>
+                    ) : (
+                      selectedDateBlocks.map((block) => (
+                        <div key={block.id} className="p-3 bg-white rounded-2xl border border-red-200 flex items-center justify-between text-xs shadow-sm">
+                          <div>
+                            <span className="font-bold text-red-900 block font-mono">
+                              {block.block_full_day ? 'Full Day Blocked' : `${block.start_time} - ${block.end_time}`}
+                            </span>
+                            <span className="text-[10px] text-gray-500">{block.reason || 'No reason specified'}</span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteBlockedPeriod(block.id)}
+                            className="p-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-xl transition-colors"
+                            title="Remove Block"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))
+                    )}
                   </div>
-                )}
+
+                </div>
+
               </div>
 
             </div>
