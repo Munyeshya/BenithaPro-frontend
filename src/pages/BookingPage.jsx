@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import API from '../services/api';
 import CalendarPicker from '../components/CalendarPicker';
+const [availableRanges, setAvailableRanges] = useState([]);
+const [blockedRanges, setBlockedRanges] = useState([]);
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
@@ -99,25 +101,150 @@ const fetchInitialData = async () => {
     }
   }, [appointmentDate, selectedPackage]);
 
-  const fetchAvailableSlots = async () => {
-    try {
-      setCheckingSlots(true);
-      setSlotError('');
-      setSelectedTime('');
-      const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
-      if (res.data.available) {
-        setAvailableSlots(res.data.available_slots);
-      } else {
-        setAvailableSlots([]);
-        setSlotError(res.data.reason || 'No available slots for this date.');
-      }
-    } catch (err) {
-      setAvailableSlots([]);
-      setSlotError('Unable to check slot availability. Please try another date.');
-    } finally {
-      setCheckingSlots(false);
+ const fetchAvailableSlots = async () => {
+  try {
+    setCheckingSlots(true);
+    setSlotError('');
+    setSelectedTime('');
+    const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
+    
+    setAvailableSlots(res.data.available_slots || []);
+    setAvailableRanges(res.data.available_ranges || []);
+    setBlockedRanges(res.data.blocked_ranges || []);
+
+    if (!res.data.available && res.data.reason) {
+      setSlotError(res.data.reason);
     }
-  };
+  } catch (err) {
+    setAvailableSlots([]);
+    setAvailableRanges([]);
+    setBlockedRanges([]);
+    setSlotError('Unable to check slot availability for this date.');
+  } finally {
+    setCheckingSlots(false);
+  }
+};
+
+// 3. Update Step 2 JSX in BookingPage.jsx:
+{currentStep === 2 && (
+  <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
+    <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
+      <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Time Slot
+    </h2>
+
+    {/* Calendar Picker Component */}
+    <CalendarPicker
+      selectedDate={appointmentDate}
+      onSelectDate={(date) => setAppointmentDate(date)}
+      fullBlockedDates={fullBlockedDates}
+      partiallyBlockedDates={partiallyBlockedDates}
+    />
+
+    {checkingSlots && (
+      <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
+        <Loader2 className="animate-spin" size={16} /> Checking availability for {appointmentDate}...
+      </div>
+    )}
+
+    {slotError && (
+      <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200">
+        <AlertCircle size={18} className="shrink-0" />
+        <div>
+          <strong className="block font-bold">Notice</strong>
+          <span>{slotError}</span>
+        </div>
+      </div>
+    )}
+
+    {!checkingSlots && (availableSlots.length > 0 || blockedRanges.length > 0) && (
+      <div className="space-y-6 pt-2">
+        
+        {/* GREEN BADGES: AVAILABLE HOUR RANGES & TIME SLOTS */}
+        {availableRanges.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs uppercase tracking-wider">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span>Available Hour Windows ({appointmentDate})</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {availableRanges.map((range, idx) => (
+                <div key={idx} className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                  <span className="text-[10px] uppercase font-bold text-emerald-700 block">Open Window</span>
+                  <p className="font-serif text-base font-bold text-emerald-900 font-mono mt-0.5">{range.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Start Time Selectors inside Open Windows */}
+            <div className="pt-2">
+              <label className="block text-xs font-semibold text-gray-700 mb-2">Select Your Preferred Start Time:</label>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                {availableSlots.map((slotObj) => (
+                  <button
+                    key={slotObj.start}
+                    type="button"
+                    onClick={() => setSelectedTime(slotObj.start)}
+                    className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center justify-center gap-1 ${
+                      selectedTime === slotObj.start 
+                        ? 'bg-emerald-600 text-white shadow-lg scale-105 ring-2 ring-emerald-400' 
+                        : 'bg-emerald-100/70 text-emerald-900 hover:bg-emerald-200 border border-emerald-300'
+                    }`}
+                  >
+                    <Clock size={12} /> {slotObj.start}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* YELLOW / AMBER BADGES: BLOCKED HOUR RANGES */}
+        {blockedRanges.length > 0 && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <span>Blocked / Unavailable Windows</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {blockedRanges.map((block, idx) => (
+                <div key={idx} className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex justify-between items-center text-xs">
+                  <div>
+                    <p className="font-bold text-amber-900 font-mono text-sm">{block.label}</p>
+                    <p className="text-[10px] text-amber-700 mt-0.5">{block.reason}</p>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase bg-amber-200 text-amber-900 px-2 py-1 rounded-lg">
+                    Blocked
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    )}
+
+    <div className="flex gap-4 pt-4">
+      <button
+        type="button"
+        onClick={() => setCurrentStep(1)}
+        className="w-1/3 bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-1"
+      >
+        <ArrowLeft size={16} /> Back
+      </button>
+      <button
+        type="button"
+        disabled={!selectedTime}
+        onClick={() => setCurrentStep(3)}
+        className="w-2/3 bg-luxury-gold disabled:bg-gray-200 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
+      >
+        Continue to Personal Info <ArrowRight size={16} />
+      </button>
+    </div>
+  </div>
+)}
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
