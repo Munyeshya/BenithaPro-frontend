@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Ban } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Ban, Clock } from 'lucide-react';
 
-export default function CalendarPicker({ selectedDate, onSelectDate, blockedDates = [] }) {
+export default function CalendarPicker({ 
+  selectedDate, 
+  onSelectDate, 
+  fullBlockedDates = [], 
+  partiallyBlockedDates = [] 
+}) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const year = currentMonth.getFullYear();
@@ -74,33 +79,58 @@ export default function CalendarPicker({ selectedDate, onSelectDate, blockedDate
 
           const isPast = item.dateStr < todayStr;
           const isSelected = selectedDate === item.dateStr;
-          const isBlocked = blockedDates.includes(item.dateStr);
+          const isFullBlocked = fullBlockedDates.includes(item.dateStr);
+          const isPartialBlocked = partiallyBlockedDates.includes(item.dateStr) && !isFullBlocked;
 
           return (
             <button
               key={item.dateStr}
               type="button"
-              disabled={isPast}
+              disabled={isPast || isFullBlocked}
               onClick={() => onSelectDate(item.dateStr)}
-              className={`p-2.5 rounded-2xl font-bold transition-all flex flex-col items-center justify-center relative ${
+              className={`p-2.5 rounded-2xl font-bold transition-all flex flex-col items-center justify-center relative min-h-[52px] ${
                 isPast
-                  ? 'text-gray-300 cursor-not-allowed'
+                  ? 'text-gray-300 cursor-not-allowed bg-gray-50'
+                  : isFullBlocked
+                  ? 'bg-red-50 text-red-400 border border-red-200 cursor-not-allowed'
                   : isSelected
                   ? 'bg-luxury-black text-luxury-gold shadow-md scale-105 ring-2 ring-luxury-gold'
-                  : isBlocked
-                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  : isPartialBlocked
+                  ? 'bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100'
                   : 'bg-luxury-cream hover:bg-luxury-nude text-luxury-black border border-transparent'
               }`}
             >
               <span>{item.day}</span>
-              {isBlocked && !isPast && (
-                <span className="text-[8px] text-red-500 font-normal leading-none mt-0.5 flex items-center gap-0.5">
-                  <Ban size={8} /> Blocked
+
+              {/* Full Block Label */}
+              {isFullBlocked && !isPast && (
+                <span className="text-[7px] text-red-500 font-semibold leading-none mt-1 flex items-center gap-0.5">
+                  <Ban size={8} /> Closed
+                </span>
+              )}
+
+              {/* Partial Block Label */}
+              {isPartialBlocked && !isPast && !isSelected && (
+                <span className="text-[7px] text-amber-700 font-semibold leading-none mt-1 flex items-center gap-0.5">
+                  <Clock size={8} /> Partial
                 </span>
               )}
             </button>
           );
         })}
+      </div>
+
+      {/* Legend */}
+      <div className="mt-4 pt-3 border-t border-gray-100 flex justify-center gap-4 text-[10px] text-gray-500">
+        <div className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded-full bg-luxury-cream border"></span> Open
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-100 border border-amber-300"></span> Partial Range
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-100 border border-red-300"></span> Fully Blocked
+        </div>
       </div>
     </div>
   );
