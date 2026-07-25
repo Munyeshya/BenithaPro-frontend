@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   Calendar, Clock, User, CreditCard, Upload, 
   CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, 
-  Loader2, Sparkles, MessageCircle 
+  Loader2, Sparkles, MessageCircle, AlertTriangle
 } from 'lucide-react';
 import API from '../services/api';
 import CalendarPicker from '../components/CalendarPicker';
@@ -13,7 +13,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const preselectedPackageId = searchParams.get('package');
 
-  // Steps: 1 = Package, 2 = Calendar & Slot, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
+  // Steps: 1 = Package, 2 = Calendar & Time Input, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
   const [currentStep, setCurrentStep] = useState(1);
 
   // Initial Setup Data State
@@ -21,10 +21,12 @@ export default function BookingPage() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [fullBlockedDates, setFullBlockedDates] = useState([]);
   const [partiallyBlockedDates, setPartiallyBlockedDates] = useState([]);
+
+  // Timeline Bar & Schedule State
   const [timelineSegments, setTimelineSegments] = useState([]);
-  const [allSlots, setAllSlots] = useState([]);
   const [openingTime, setOpeningTime] = useState('');
   const [closingTime, setClosingTime] = useState(''); 
+  const [blockedRanges, setBlockedRanges] = useState([]);
 
   // Package Selection State
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -32,12 +34,11 @@ export default function BookingPage() {
 
   // Date & Time Selection State
   const [appointmentDate, setAppointmentDate] = useState('');
-  const [availableSlots, setAvailableSlots] = useState([]);
-  const [availableRanges, setAvailableRanges] = useState([]);
-  const [blockedRanges, setBlockedRanges] = useState([]);
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedTime, setSelectedTime] = useState(''); // Input format HH:MM
+  const [calculatedEndTime, setCalculatedEndTime] = useState('');
   const [checkingSlots, setCheckingSlots] = useState(false);
   const [slotError, setSlotError] = useState('');
+  const [overlapWarning, setOverlapWarning] = useState('');
 
   // Personal & Payment Details State
   const [formData, setFormData] = useState({
@@ -97,7 +98,7 @@ export default function BookingPage() {
     }
   };
 
-  // Fetch Available Hours when Date or Package changes
+  // Fetch Schedule Overview when Date or Package changes
   useEffect(() => {
     if (appointmentDate && selectedPackage) {
       fetchAvailableSlots();
@@ -105,167 +106,90 @@ export default function BookingPage() {
   }, [appointmentDate, selectedPackage]);
 
   const fetchAvailableSlots = async () => {
-  try {
-    setCheckingSlots(true);
-    setSlotError('');
-    setSelectedTime('');
-    
-    const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
-    
-    setTimelineSegments(res.data.timeline_segments || []);
-    setAllSlots(res.data.all_slots || []);
-    setOpeningTime(res.data.opening_time || '');
-    setClosingTime(res.data.closing_time || '');
+    try {
+      setCheckingSlots(true);
+      setSlotError('');
+      setOverlapWarning('');
+      setSelectedTime('');
+      setCalculatedEndTime('');
+      
+      const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
+      
+      setTimelineSegments(res.data.timeline_segments || []);
+      setOpeningTime(res.data.opening_time || '');
+      setClosingTime(res.data.closing_time || '');
+      setBlockedRanges(res.data.blocked_ranges || []);
 
-    if (!res.data.available && res.data.reason) {
-      setSlotError(res.data.reason);
+      if (!res.data.available && res.data.reason) {
+        setSlotError(res.data.reason);
+      }
+    } catch (err) {
+      setTimelineSegments([]);
+      setBlockedRanges([]);
+      setSlotError('Unable to check slot availability for this date.');
+    } finally {
+      setCheckingSlots(false);
     }
-  } catch (err) {
-    setTimelineSegments([]);
-    setAllSlots([]);
-    setSlotError('Unable to check slot availability for this date.');
-  } finally {
-    setCheckingSlots(false);
-  }
-};
+  };
 
-// STEP 2 JSX RENDER:
-{currentStep === 2 && (
-  <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
-    <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-      <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Time Slot
-    </h2>
+  // Real-time calculation and validation whenever user inputs a time
+  const handleTimeInputChange = (inputTime) => {
+    setSelectedTime(inputTime);
+    setOverlapWarning('');
 
-    {/* Calendar Picker Component */}
-    <CalendarPicker
-      selectedDate={appointmentDate}
-      onSelectDate={(date) => setAppointmentDate(date)}
-      fullBlockedDates={fullBlockedDates}
-      partiallyBlockedDates={partiallyBlockedDates}
-    />
+    if (!inputTime || !selectedPackage) {
+      setCalculatedEndTime('');
+      return;
+    }
 
-    {checkingSlots && (
-      <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
-        <Loader2 className="animate-spin" size={16} /> Loading studio schedule...
-      </div>
-    )}
+    // 1. Calculate Session End Time (Start Time + Package Duration)
+    const [hrs, mins] = inputTime.split(':').map(Number);
+    const startTotalMins = hrs * 60 + mins;
+    const endTotalMins = startTotalMins + selectedPackage.duration_minutes;
 
-    {slotError && (
-      <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200">
-        <AlertCircle size={18} className="shrink-0" />
-        <div>
-          <strong className="block font-bold">Closed / Fully Booked</strong>
-          <span>{slotError}</span>
-        </div>
-      </div>
-    )}
+    const endHrs = String(Math.floor(endTotalMins / 60)).padStart(2, '0');
+    const endMins = String(endTotalMins % 60).padStart(2, '0');
+    const formattedEndTime = `${endHrs}:${endMins}`;
+    setCalculatedEndTime(formattedEndTime);
 
-    {!checkingSlots && timelineSegments.length > 0 && (
-      <div className="space-y-6 pt-2">
-        
-        {/* 1. VISUAL PROPORTIONAL WORKING HOURS TIMELINE BAR */}
-        <div className="bg-luxury-cream p-5 rounded-3xl border border-luxury-nude space-y-3">
-          <div className="flex justify-between items-center text-xs font-bold text-luxury-black">
-            <span className="uppercase tracking-wider">Working Hours Overview</span>
-            <span className="font-mono text-gray-500">{openingTime} - {closingTime}</span>
-          </div>
+    // 2. Validate Operating Studio Hours Boundary
+    if (openingTime && closingTime) {
+      const [opHrs, opMins] = openingTime.split(':').map(Number);
+      const [clHrs, clMins] = closingTime.split(':').map(Number);
+      const opTotalMins = opHrs * 60 + opMins;
+      const clTotalMins = clHrs * 60 + clMins;
 
-          {/* Continuous Multi-Color Bar */}
-          <div className="w-full h-8 bg-gray-200 rounded-2xl overflow-hidden flex shadow-inner p-1 gap-1">
-            {timelineSegments.map((seg, idx) => (
-              <div
-                key={idx}
-                style={{ width: `${seg.width_percent}%` }}
-                title={`${seg.label} (${seg.reason})`}
-                className={`h-full rounded-xl transition-all flex items-center justify-center text-[10px] font-bold text-white font-mono px-1 overflow-hidden truncate ${
-                  seg.type === 'available'
-                    ? 'bg-emerald-500 shadow-sm'
-                    : seg.type === 'blocked'
-                    ? 'bg-amber-400 text-amber-950 shadow-sm'
-                    : 'bg-red-800 shadow-sm'
-                }`}
-              >
-                {seg.width_percent > 15 && seg.label}
-              </div>
-            ))}
-          </div>
+      if (startTotalMins < opTotalMins) {
+        setOverlapWarning(`Studio opens at ${openingTime}. Please enter a start time after opening.`);
+        return;
+      }
 
-          {/* Timeline Bar Legend */}
-          <div className="flex flex-wrap justify-center gap-4 text-[10px] pt-1">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
-              <span className="font-semibold text-gray-700">Available Range</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-md bg-amber-400"></span>
-              <span className="font-semibold text-gray-700">Blocked Range / Break</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-md bg-red-800"></span>
-              <span className="font-semibold text-gray-700">Booked</span>
-            </div>
-          </div>
-        </div>
+      if (endTotalMins > clTotalMins) {
+        setOverlapWarning(`Package duration of ${selectedPackage.duration_minutes} mins exceeds closing time (${closingTime}). Finish time would be ${formattedEndTime}.`);
+        return;
+      }
+    }
 
-        {/* 2. INDIVIDUAL TIME SLOTS SELECTOR */}
-        {allSlots.length > 0 && (
-          <div className="space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black">
-              Select Your Appointment Start Time ({appointmentDate})
-            </label>
+    // 3. Validate Overlap with Restricted / Blocked Ranges
+    for (const segment of timelineSegments) {
+      if (segment.type !== 'available' && segment.label) {
+        // Parse range "HH:MM - HH:MM"
+        const times = segment.label.split(' - ');
+        if (times.length === 2) {
+          const [bStartH, bStartM] = times[0].split(':').map(Number);
+          const [bEndH, bEndM] = times[1].split(':').map(Number);
+          const blockStartMins = bStartH * 60 + bStartM;
+          const blockEndMins = bEndH * 60 + bEndM;
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-              {allSlots.map((slotObj) => (
-                <button
-                  key={slotObj.time}
-                  type="button"
-                  disabled={!slotObj.is_available}
-                  onClick={() => setSelectedTime(slotObj.time)}
-                  className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex flex-col items-center justify-center gap-0.5 ${
-                    !slotObj.is_available
-                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed line-through opacity-70'
-                      : selectedTime === slotObj.time
-                      ? 'bg-luxury-black text-luxury-gold shadow-lg scale-105 ring-2 ring-luxury-gold'
-                      : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border border-emerald-300'
-                  }`}
-                  title={slotObj.is_available ? 'Available' : slotObj.reason}
-                >
-                  <div className="flex items-center gap-1">
-                    <Clock size={12} /> {slotObj.time}
-                  </div>
-                  {!slotObj.is_available && (
-                    <span className="text-[8px] no-underline font-sans text-red-500">Blocked</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </div>
-    )}
-
-    <div className="flex gap-4 pt-4">
-      <button
-        type="button"
-        onClick={() => setCurrentStep(1)}
-        className="w-1/3 bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-1"
-      >
-        <ArrowLeft size={16} /> Back
-      </button>
-      <button
-        type="button"
-        disabled={!selectedTime}
-        onClick={() => setCurrentStep(3)}
-        className="w-2/3 bg-luxury-gold disabled:bg-gray-200 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
-      >
-        Continue to Personal Info <ArrowRight size={16} />
-      </button>
-    </div>
-  </div>
-)}
-
-  // STEP 3 JSX RENDER: 
+          // Check if [startTotalMins, endTotalMins) overlaps with [blockStartMins, blockEndMins)
+          if (startTotalMins < blockEndMins && endTotalMins > blockStartMins) {
+            setOverlapWarning(`Chosen window (${inputTime} - ${formattedEndTime}) touches a restricted period: ${segment.label} (${segment.reason}).`);
+            return;
+          }
+        }
+      }
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -340,7 +264,7 @@ export default function BookingPage() {
           <div className="flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
             {[
               { step: 1, label: 'Package' },
-              { step: 2, label: 'Calendar' },
+              { step: 2, label: 'Calendar & Time' },
               { step: 3, label: 'Your Info' },
               { step: 4, label: 'Deposit' },
             ].map(({ step, label }) => (
@@ -434,13 +358,14 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* STEP 2: CALENDAR & TIME WINDOW SELECTION */}
+        {/* STEP 2: CALENDAR & FORM INPUT FOR START TIME */}
         {currentStep === 2 && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Time Window
+              <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Starting Hour
             </h2>
 
+            {/* Interactive Calendar Component */}
             <CalendarPicker
               selectedDate={appointmentDate}
               onSelectDate={(date) => setAppointmentDate(date)}
@@ -450,7 +375,7 @@ export default function BookingPage() {
 
             {checkingSlots && (
               <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
-                <Loader2 className="animate-spin" size={16} /> Checking availability for {appointmentDate}...
+                <Loader2 className="animate-spin" size={16} /> Loading studio working hours for {appointmentDate}...
               </div>
             )}
 
@@ -458,77 +383,103 @@ export default function BookingPage() {
               <div className="p-4 bg-red-50 text-red-700 text-xs rounded-2xl flex items-center gap-2 border border-red-200">
                 <AlertCircle size={18} className="shrink-0" />
                 <div>
-                  <strong className="block font-bold">Notice</strong>
+                  <strong className="block font-bold">Studio Closed</strong>
                   <span>{slotError}</span>
                 </div>
               </div>
             )}
 
-            {!checkingSlots && (availableSlots.length > 0 || blockedRanges.length > 0) && (
+            {!checkingSlots && appointmentDate && !slotError && (
               <div className="space-y-6 pt-2">
                 
-                {/* GREEN: AVAILABLE RANGES & SLOTS */}
-                {availableRanges.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs uppercase tracking-wider">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                      <span>Available Hour Windows ({appointmentDate})</span>
-                    </div>
+                {/* 1. VISUAL PROPORTIONAL WORKING HOURS TIMELINE BAR */}
+                <div className="bg-luxury-cream p-5 rounded-3xl border border-luxury-nude space-y-3">
+                  <div className="flex justify-between items-center text-xs font-bold text-luxury-black">
+                    <span className="uppercase tracking-wider">Working Hours Overview</span>
+                    <span className="font-mono text-gray-500">{openingTime} - {closingTime}</span>
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {availableRanges.map((range, idx) => (
-                        <div key={idx} className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                          <span className="text-[10px] uppercase font-bold text-emerald-700 block">Open Window</span>
-                          <p className="font-serif text-base font-bold text-emerald-900 font-mono mt-0.5">{range.label}</p>
+                  {/* Proportional Multi-Color Timeline Bar */}
+                  <div className="w-full h-8 bg-gray-200 rounded-2xl overflow-hidden flex shadow-inner p-1 gap-1">
+                    {timelineSegments.map((seg, idx) => (
+                      <div
+                        key={idx}
+                        style={{ width: `${seg.width_percent}%` }}
+                        title={`${seg.label} (${seg.reason})`}
+                        className={`h-full rounded-xl transition-all flex items-center justify-center text-[10px] font-bold text-white font-mono px-1 overflow-hidden truncate ${
+                          seg.type === 'available'
+                            ? 'bg-emerald-500 shadow-sm'
+                            : seg.type === 'blocked'
+                            ? 'bg-amber-400 text-amber-950 shadow-sm'
+                            : 'bg-red-800 shadow-sm'
+                        }`}
+                      >
+                        {seg.width_percent > 15 && seg.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex flex-wrap justify-center gap-4 text-[10px] pt-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
+                      <span className="font-semibold text-gray-700">Available Range</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-md bg-amber-400"></span>
+                      <span className="font-semibold text-gray-700">Blocked Range / Break</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-md bg-red-800"></span>
+                      <span className="font-semibold text-gray-700">Booked</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. FORM TIME INPUT FIELD & VALIDATION BARRIER */}
+                <div className="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 shadow-sm">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black mb-1">
+                      Enter Desired Starting Time *
+                    </label>
+                    <p className="text-[11px] text-gray-500 mb-2">
+                      Package Duration: <strong>{selectedPackage?.duration_minutes} Mins</strong>
+                    </p>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="time"
+                        required
+                        value={selectedTime}
+                        onChange={(e) => handleTimeInputChange(e.target.value)}
+                        className="p-3 border border-gray-300 rounded-xl text-sm font-bold font-mono focus:ring-2 focus:ring-luxury-gold focus:outline-none"
+                      />
+                      {selectedTime && calculatedEndTime && (
+                        <div className="text-xs font-mono bg-luxury-cream p-2.5 rounded-xl border">
+                          Calculated Window: <strong className="text-luxury-black">{selectedTime} - {calculatedEndTime}</strong>
                         </div>
-                      ))}
+                      )}
                     </div>
+                  </div>
 
-                    <div className="pt-2">
-                      <label className="block text-xs font-semibold text-gray-700 mb-2">Select Your Preferred Start Time:</label>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                        {availableSlots.map((slotObj) => (
-                          <button
-                            key={slotObj.start}
-                            type="button"
-                            onClick={() => setSelectedTime(slotObj.start)}
-                            className={`py-3 px-2 rounded-xl text-xs font-bold font-mono transition-all flex items-center justify-center gap-1 ${
-                              selectedTime === slotObj.start 
-                                ? 'bg-emerald-600 text-white shadow-lg scale-105 ring-2 ring-emerald-400' 
-                                : 'bg-emerald-100/70 text-emerald-900 hover:bg-emerald-200 border border-emerald-300'
-                            }`}
-                          >
-                            <Clock size={12} /> {slotObj.start}
-                          </button>
-                        ))}
+                  {/* OVERLAP / RESTRICTED CONFLICT WARNING */}
+                  {overlapWarning && (
+                    <div className="p-4 bg-amber-50 text-amber-900 border border-amber-300 rounded-2xl text-xs flex items-start gap-2.5">
+                      <AlertTriangle size={18} className="shrink-0 text-amber-600 mt-0.5" />
+                      <div>
+                        <strong className="block font-bold">Time Conflict Detected</strong>
+                        <span>{overlapWarning}</span>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* YELLOW: BLOCKED RANGES */}
-                {blockedRanges.length > 0 && (
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                      <span>Blocked / Unavailable Windows</span>
+                  {!overlapWarning && selectedTime && (
+                    <div className="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-emerald-600" />
+                      <span>This start time is available and within open operating hours.</span>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {blockedRanges.map((block, idx) => (
-                        <div key={idx} className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex justify-between items-center text-xs">
-                          <div>
-                            <p className="font-bold text-amber-900 font-mono text-sm">{block.label}</p>
-                            <p className="text-[10px] text-amber-700 mt-0.5">{block.reason}</p>
-                          </div>
-                          <span className="text-[10px] font-bold uppercase bg-amber-200 text-amber-900 px-2 py-1 rounded-lg">
-                            Blocked
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
               </div>
             )}
@@ -543,9 +494,9 @@ export default function BookingPage() {
               </button>
               <button
                 type="button"
-                disabled={!selectedTime}
+                disabled={!selectedTime || !!overlapWarning || !calculatedEndTime}
                 onClick={() => setCurrentStep(3)}
-                className="w-2/3 bg-luxury-gold disabled:bg-gray-200 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
+                className="w-2/3 bg-luxury-gold disabled:bg-gray-200 disabled:text-gray-400 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
               >
                 Continue to Personal Info <ArrowRight size={16} />
               </button>
