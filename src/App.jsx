@@ -5,10 +5,10 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PackagesPage from './pages/PackagesPage';
+import BookingPage from './pages/BookingPage';
 
 // Other placeholders
 const HomePage = () => <div className="pt-32 pb-20 text-center font-serif text-3xl font-bold">Home Page Component</div>;
-const BookingPage = () => <div className="pt-32 pb-20 text-center font-serif text-3xl font-bold">Interactive Booking Form</div>;
 const AdminLoginPage = () => <div className="pt-32 pb-20 text-center font-serif text-3xl font-bold">Admin Login</div>;
 const AdminDashboardPage = () => <div className="pt-32 pb-20 text-center font-serif text-3xl font-bold">Admin Dashboard</div>;
 
