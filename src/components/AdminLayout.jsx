@@ -39,6 +39,7 @@ export default function AdminLayout() {
     { path: '/admin/reports', label: 'Reports & Analytics', icon: BarChart3 },
     { path: '/admin/services', label: 'Manage Services', icon: Layers },
     { path: '/packages', label: 'View Public Shop', icon: Sparkles },
+    { path: '/admin/media', label: 'Media & Gallery', icon: Image },
   ];
 
   return (
