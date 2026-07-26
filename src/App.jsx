@@ -13,6 +13,9 @@ import TrackAppointmentPage from './pages/TrackAppointmentPage';
 import BookingPage from './pages/BookingPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminAppointmentsPage from './pages/admin/AdminAppointmentsPage';
+import AdminSchedulePage from './pages/admin/AdminSchedulePage';
+import AdminReportsPage from './pages/admin/AdminReportsPage';
 
 export default function App() {
   return (
@@ -41,6 +44,10 @@ export default function App() {
           {/* ================= INDEPENDENT ADMIN PORTAL ROUTES (With Sidebar Layout) ================= */}
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/appointments" element={<AdminAppointmentsPage />} />
+            <Route path="/admin/schedule" element={<AdminSchedulePage />} />
+            <Route path="/admin/reports" element={<AdminReportsPage />} />
+            <Route path="/admin/services" element={<AdminDashboardPage />} /> 
           </Route>
         </Routes>
       </Router>

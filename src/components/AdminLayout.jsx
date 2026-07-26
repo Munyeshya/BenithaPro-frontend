@@ -16,21 +16,12 @@ export default function AdminLayout() {
     navigate('/admin/login');
   };
 
-  const navLinks = [
-    { path: '/admin/dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
-    { path: '/admin/appointments', label: 'Appointments List', icon: FileText },
-    { path: '/admin/schedule', label: 'Operating Hours', icon: Calendar },
-    { path: '/admin/reports', label: 'Reports & Analytics', icon: BarChart3 },
-    { path: '/admin/services', label: 'Manage Services', icon: Layers },
-  ];
-
   return (
     <div className="min-h-screen bg-luxury-cream text-luxury-black flex font-sans">
       
-      {/* 1. SIDEBAR NAVIGATION */}
+      {/* SIDEBAR */}
       <aside className="w-64 bg-luxury-black text-white flex flex-col justify-between border-r border-luxury-charcoal shrink-0 hidden md:flex">
         <div>
-          {/* Brand Header */}
           <div className="p-6 border-b border-luxury-charcoal">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 bg-luxury-pink text-luxury-black flex items-center justify-center font-serif font-bold text-base shadow">
@@ -40,20 +31,17 @@ export default function AdminLayout() {
                 <span className="font-sans font-light text-base tracking-wider uppercase block text-white">
                   Benitha<span className="text-luxury-pink">Admin</span>
                 </span>
-                <span className="text-[9px] uppercase tracking-widest text-gray-400 font-sans">
-                  Management Portal
-                </span>
+                <span className="text-[9px] uppercase tracking-widest text-gray-400 font-sans">Management Portal</span>
               </div>
             </div>
           </div>
 
-          {/* Navigation Menu */}
           <nav className="p-4 space-y-1.5 font-sans font-light text-xs uppercase tracking-widest">
             {[
-              { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              { path: '/admin/dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
               { path: '/admin/appointments', label: 'Appointments List', icon: FileText },
               { path: '/admin/schedule', label: 'Operating Hours', icon: Calendar },
-              { path: '/admin/reports', label: 'Reports', icon: BarChart3 },
+              { path: '/admin/reports', label: 'Reports & Analytics', icon: BarChart3 },
               { path: '/admin/services', label: 'Manage Services', icon: Layers },
               { path: '/packages', label: 'View Public Shop', icon: Sparkles },
             ].map((item) => {
@@ -77,7 +65,6 @@ export default function AdminLayout() {
           </nav>
         </div>
 
-        {/* Sidebar Footer / Admin Profile */}
         <div className="p-4 border-t border-luxury-charcoal space-y-3">
           <div className="px-4 py-2 bg-luxury-charcoal text-xs text-gray-300 flex items-center gap-2">
             <User size={14} className="text-luxury-pink shrink-0" />
@@ -86,7 +73,6 @@ export default function AdminLayout() {
               <strong className="text-white font-normal truncate block">{admin?.username || 'Administrator'}</strong>
             </div>
           </div>
-
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 bg-red-950/40 hover:bg-red-900 text-red-300 font-sans font-light text-xs uppercase tracking-widest py-3 transition-colors border border-red-900/50"
@@ -96,10 +82,8 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* 2. MAIN CONTAINER WITH WELCOME HEADER */}
+      {/* MAIN CONTAINER */}
       <div className="flex-grow flex flex-col min-w-0">
-        
-        {/* Top Header with Welcome Message */}
         <header className="bg-white border-b border-luxury-nude px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-sm">
           <div>
             <span className="text-[10px] uppercase font-bold text-luxury-pink tracking-widest font-sans">Admin Control Center</span>
@@ -107,7 +91,6 @@ export default function AdminLayout() {
               Welcome back, {admin?.username || 'Administrator'} ✨
             </h1>
           </div>
-
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-500 font-sans hidden sm:inline">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -121,11 +104,9 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        {/* Main Content Outlet */}
         <main className="flex-grow p-4 sm:p-8 overflow-y-auto">
           <Outlet />
         </main>
-
       </div>
     </div>
   );
