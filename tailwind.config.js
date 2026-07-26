@@ -8,24 +8,24 @@ export default {
     extend: {
       colors: {
         luxury: {
-          black: '#111111',      // Pure jet black
-          charcoal: '#1A1A1A',   // Soft charcoal
-          white: '#FFFFFF',      // Crisp white
-          cream: '#FFF9FB',      // Soft pearl pinkish-ivory tint
-          nude: '#FCE7EC',       // Light romantic pink card tint
+          black: '#111111',
+          charcoal: '#1A1A1A',
+          white: '#FFFFFF',
+          cream: '#FFF9FB',
+          nude: '#FCE7EC',
           pink: {
-            light: '#FFB6C1',    // Light blush pink
-            DEFAULT: '#FF69B4',  // Standard chic pink
-            dark: '#C71585',     // Deeper dramatic dark pink / magenta
-            berry: '#880E4F',    // Deep luxury dark berry pink
+            light: '#FFB6C1',
+            DEFAULT: '#FF69B4',
+            dark: '#C71585',
+            berry: '#880E4F',
           },
-          gold: '#FF69B4',       // Primary pink accent
-          rosegold: '#C71585',   // Darker pink accent substitute
+          gold: '#FF69B4',
+          rosegold: '#C71585',
         }
       },
       fontFamily: {
-        serif: ['"Playfair Display"', 'serif'],
-        sans: ['Inter', 'sans-serif'],
+        serif: ['"Cormorant Garamond"', 'serif'],
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
       },
     },
   },
