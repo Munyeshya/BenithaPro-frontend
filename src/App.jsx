@@ -16,6 +16,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminAppointmentsPage from './pages/admin/AdminAppointmentsPage';
 import AdminSchedulePage from './pages/admin/AdminSchedulePage';
 import AdminReportsPage from './pages/admin/AdminReportsPage';
+import AdminServicesPage from './pages/admin/AdminServicesPage';
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/admin/schedule" element={<AdminSchedulePage />} />
             <Route path="/admin/reports" element={<AdminReportsPage />} />
             <Route path="/admin/services" element={<AdminDashboardPage />} /> 
+            <Route path="/admin/services" element={<AdminServicesPage />} />
           </Route>
         </Routes>
       </Router>
