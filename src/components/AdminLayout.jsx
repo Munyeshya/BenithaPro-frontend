@@ -5,6 +5,7 @@ import {
   FileText, BarChart3, LogOut, Sparkles, User, Menu, X, Settings 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import AdminSettingsModal from './AdminSettingsModal';
 
 export default function AdminLayout() {
   const { logout, admin } = useAuth();
@@ -12,6 +13,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -107,7 +109,6 @@ export default function AdminLayout() {
 
             <div>
               <span className="text-[9px] uppercase font-bold text-luxury-pink tracking-widest font-sans block">Admin Control Center</span>
-              {/* Made text smaller */}
               <h1 className="font-serif text-base sm:text-lg font-bold text-luxury-black truncate">
                 Welcome back, {admin?.username || 'admin'} ✨
               </h1>
@@ -138,7 +139,7 @@ export default function AdminLayout() {
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
-                    alert('Account settings modal or page can go here.');
+                    setSettingsModalOpen(true);
                   }}
                   className="w-full text-left px-4 py-2.5 hover:bg-luxury-cream text-gray-700 flex items-center gap-2 uppercase tracking-wider"
                 >
@@ -187,6 +188,9 @@ export default function AdminLayout() {
         </main>
 
       </div>
+
+      {/* Admin Account Settings Modal */}
+      <AdminSettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
     </div>
   );
 }
