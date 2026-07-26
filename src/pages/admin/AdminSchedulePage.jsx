@@ -56,7 +56,6 @@ export default function AdminSchedulePage() {
         API.get('/admin/blocked-periods/')
       ]);
       
-      // Ensure fallback strings for inputs to prevent controlled/uncontrolled warnings
       const sanitizedSchedules = (schedRes.data || []).map(s => ({
         ...s,
         start_time: s.start_time || '09:00',
@@ -188,7 +187,7 @@ export default function AdminSchedulePage() {
               disabled={savingSchedule}
               className="bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2 shadow"
             >
-              {savingSchedule ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} Save Schedule Changes
+              {savingSchedule ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} Save
             </button>
           </div>
 
