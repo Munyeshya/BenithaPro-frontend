@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext'; // Import your AuthProvider
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingMakeupBackground from './components/FloatingMakeupBackground';
+import AdminLayout from './components/AdminLayout';
 
 import HomePage from './pages/HomePage';
 import PackagesPage from './pages/PackagesPage';
@@ -17,22 +18,31 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-luxury-cream text-luxury-black relative selection:bg-luxury-pink selection:text-white">
-          <FloatingMakeupBackground />
-          <Navbar />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/packages" element={<PackagesPage />} />
-              <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/track" element={<TrackAppointmentPage />} />
-              <Route path="/book" element={<BookingPage />} />
-              <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Routes>
+          {/* ================= PUBLIC CLIENT ROUTES (With Navbar & Footer) ================= */}
+          <Route path="/*" element={
+            <div className="min-h-screen flex flex-col bg-luxury-cream text-luxury-black relative selection:bg-luxury-pink selection:text-white">
+              <FloatingMakeupBackground />
+              <Navbar />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/packages" element={<PackagesPage />} />
+                  <Route path="/gallery" element={<GalleryPage />} />
+                  <Route path="/track" element={<TrackAppointmentPage />} />
+                  <Route path="/book" element={<BookingPage />} />
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          } />
+
+          {/* ================= INDEPENDENT ADMIN PORTAL ROUTES (With Sidebar Layout) ================= */}
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          </Route>
+        </Routes>
       </Router>
     </AuthProvider>
   );
