@@ -24,8 +24,9 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['"Cinzel"', 'serif'],            // Tall, regal, editorial titles
-        sans: ['"Outfit"', 'sans-serif'],        // Tall, clean, elegant body text
+        serif: ['"Cinzel"', 'serif'],
+        sans: ['"Outfit"', 'sans-serif'],
+        nav: ['"Oswald"', 'sans-serif'], // Added custom font for Navbar
       },
     },
   },
