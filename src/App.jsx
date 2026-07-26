@@ -23,7 +23,7 @@ export default function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* ================= PUBLIC CLIENT ROUTES (With Navbar & Footer) ================= */}
+          {/* ================= PUBLIC CLIENT ROUTES ================= */}
           <Route path="/*" element={
             <div className="min-h-screen flex flex-col bg-luxury-cream text-luxury-black relative selection:bg-luxury-pink selection:text-white">
               <FloatingMakeupBackground />
@@ -42,13 +42,12 @@ export default function App() {
             </div>
           } />
 
-          {/* ================= INDEPENDENT ADMIN PORTAL ROUTES (With Sidebar Layout) ================= */}
+          {/* ================= ADMIN PORTAL ROUTES ================= */}
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/admin/appointments" element={<AdminAppointmentsPage />} />
             <Route path="/admin/schedule" element={<AdminSchedulePage />} />
             <Route path="/admin/reports" element={<AdminReportsPage />} />
-            <Route path="/admin/services" element={<AdminDashboardPage />} /> 
             <Route path="/admin/services" element={<AdminServicesPage />} />
           </Route>
         </Routes>
