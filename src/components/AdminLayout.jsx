@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, Layers, 
-  FileText, BarChart3, LogOut, Sparkles, User, Menu, X 
+  FileText, BarChart3, LogOut, Sparkles, User, Menu, X, Settings 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,6 +11,19 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -29,7 +42,7 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-luxury-cream text-luxury-black flex font-sans overflow-hidden">
       
-      {/* 1. FIXED DESKTOP SIDEBAR (Does not scroll with content) */}
+      {/* 1. FIXED DESKTOP SIDEBAR */}
       <aside className="w-64 bg-luxury-black text-white flex-col justify-between border-r border-luxury-charcoal shrink-0 hidden md:flex h-screen sticky top-0">
         <div>
           {/* Brand Header */}
@@ -78,47 +91,73 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* 2. MAIN CONTAINER WITH FIXED HEADER & SCROLLABLE CONTENT */}
+      {/* 2. MAIN CONTAINER */}
       <div className="flex-grow flex flex-col h-screen min-w-0 overflow-hidden">
         
-        {/* Top Header (Includes Welcome & Moved Admin Login/Logout Section) */}
-        <header className="bg-white border-b border-luxury-nude px-6 py-4 flex justify-between items-center shadow-sm shrink-0 z-20">
-          <div className="flex items-center gap-4">
+        {/* Top Header */}
+        <header className="bg-white border-b border-luxury-nude px-4 sm:px-6 py-3 flex justify-between items-center shadow-sm shrink-0 z-20">
+          <div className="flex items-center gap-3">
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 text-luxury-black hover:text-luxury-pink"
             >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
             <div>
-              <span className="text-[10px] uppercase font-bold text-luxury-pink tracking-widest font-sans block">Admin Control Center</span>
-              <h1 className="font-serif text-xl sm:text-2xl font-bold text-luxury-black truncate">
-                Welcome back, {admin?.username || 'Administrator'} ✨
+              <span className="text-[9px] uppercase font-bold text-luxury-pink tracking-widest font-sans block">Admin Control Center</span>
+              {/* Made text smaller */}
+              <h1 className="font-serif text-base sm:text-lg font-bold text-luxury-black truncate">
+                Welcome back, {admin?.username || 'admin'} ✨
               </h1>
             </div>
           </div>
 
-          {/* Moved Admin Status & Logout to Header */}
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-luxury-cream border border-luxury-nude text-xs">
-              <User size={14} className="text-luxury-pink" />
-              <span className="text-gray-700 font-medium">Logged in as <strong className="text-luxury-black">{admin?.username || 'admin'}</strong></span>
-            </div>
-
+          {/* Admin Profile Dropdown Icon */}
+          <div className="relative" ref={dropdownRef}>
             <button
-              onClick={handleLogout}
-              className="bg-red-50 hover:bg-red-100 text-red-700 text-xs px-4 py-2 font-light uppercase tracking-wider border border-red-200 transition-colors flex items-center gap-1.5"
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="flex items-center gap-2 p-2 bg-luxury-cream hover:bg-luxury-nude border border-luxury-nude transition-colors rounded-none"
+              title="Admin Profile"
             >
-              <LogOut size={14} /> Logout
+              <div className="w-7 h-7 bg-luxury-black text-luxury-pink flex items-center justify-center font-bold text-xs">
+                <User size={16} />
+              </div>
+              <span className="hidden sm:inline text-xs font-sans font-medium text-luxury-black">
+                {admin?.username || 'admin'}
+              </span>
             </button>
+
+            {/* Dropdown Menu */}
+            {profileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-luxury-nude shadow-2xl py-1 z-50 text-xs font-sans">
+                <div className="px-4 py-2 border-b border-gray-100 text-gray-500 text-[10px] uppercase">
+                  Signed in as <strong className="text-luxury-black block truncate">{admin?.username || 'admin'}</strong>
+                </div>
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    alert('Account settings modal or page can go here.');
+                  }}
+                  className="w-full text-left px-4 py-2.5 hover:bg-luxury-cream text-gray-700 flex items-center gap-2 uppercase tracking-wider"
+                >
+                  <Settings size={14} /> Account Settings
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-600 flex items-center gap-2 uppercase tracking-wider border-t border-gray-100"
+                >
+                  <LogOut size={14} /> Logout
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-luxury-black text-white p-6 space-y-3 absolute top-20 left-0 right-0 z-50 border-b border-luxury-charcoal shadow-2xl">
+          <div className="md:hidden bg-luxury-black text-white p-6 space-y-3 absolute top-16 left-0 right-0 z-50 border-b border-luxury-charcoal shadow-2xl">
             <div className="text-xs text-gray-400 pb-2 border-b border-luxury-charcoal flex items-center gap-2">
               <User size={14} className="text-luxury-pink" /> Logged in as <strong>{admin?.username || 'admin'}</strong>
             </div>
