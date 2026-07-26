@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingMakeupBackground from './components/FloatingMakeupBackground';
 import AdminLayout from './components/AdminLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import HomePage from './pages/HomePage';
 import PackagesPage from './pages/PackagesPage';
@@ -42,13 +43,15 @@ export default function App() {
             </div>
           } />
 
-          {/* ================= ADMIN PORTAL ROUTES ================= */}
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-            <Route path="/admin/appointments" element={<AdminAppointmentsPage />} />
-            <Route path="/admin/schedule" element={<AdminSchedulePage />} />
-            <Route path="/admin/reports" element={<AdminReportsPage />} />
-            <Route path="/admin/services" element={<AdminServicesPage />} />
+          {/* ================= PROTECTED ADMIN PORTAL ROUTES ================= */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/appointments" element={<AdminAppointmentsPage />} />
+              <Route path="/admin/schedule" element={<AdminSchedulePage />} />
+              <Route path="/admin/reports" element={<AdminReportsPage />} />
+              <Route path="/admin/services" element={<AdminServicesPage />} />
+            </Route>
           </Route>
         </Routes>
       </Router>
