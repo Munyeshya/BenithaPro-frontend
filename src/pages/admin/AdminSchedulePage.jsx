@@ -3,6 +3,31 @@ import { Calendar as CalendarIcon, Plus, Trash2, Clock, Save, Loader2, ArrowLeft
 import API from '../../services/api';
 import CalendarPicker from '../../components/CalendarPicker';
 
+// Mapping helper for days of the week (supports both integer strings/numbers and string names)
+const DAY_NAMES = {
+  '0': 'Monday',
+  '1': 'Tuesday',
+  '2': 'Wednesday',
+  '3': 'Thursday',
+  '4': 'Friday',
+  '5': 'Saturday',
+  '6': 'Sunday',
+  // Fallbacks if already strings
+  'monday': 'Monday',
+  'tuesday': 'Tuesday',
+  'wednesday': 'Wednesday',
+  'thursday': 'Thursday',
+  'friday': 'Friday',
+  'saturday': 'Saturday',
+  'sunday': 'Sunday'
+};
+
+const getDayDisplayName = (val) => {
+  if (val === undefined || val === null) return 'Day';
+  const strVal = String(val).toLowerCase().trim();
+  return DAY_NAMES[strVal] || val;
+};
+
 export default function AdminSchedulePage() {
   const [schedules, setSchedules] = useState([]);
   const [blockedPeriods, setBlockedPeriods] = useState([]);
@@ -157,7 +182,9 @@ export default function AdminSchedulePage() {
             {schedules.map((sched, index) => (
               <div key={sched.id || index} className="p-4 bg-luxury-cream border border-luxury-nude space-y-3">
                 <div className="flex justify-between items-center">
-                  <strong className="font-serif text-base text-luxury-black uppercase tracking-wider">{sched.day_of_week}</strong>
+                  <strong className="font-serif text-base text-luxury-black uppercase tracking-wider">
+                    {getDayDisplayName(sched.day_of_week)}
+                  </strong>
                   <div className="flex items-center gap-1.5 text-xs">
                     <input
                       type="checkbox"
