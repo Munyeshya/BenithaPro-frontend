@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Plus, Trash2, Clock, Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Trash2, Clock, Save, Loader2, ArrowLeft, Settings2 } from 'lucide-react';
 import API from '../../services/api';
 import CalendarPicker from '../../components/CalendarPicker';
 
@@ -8,6 +8,10 @@ export default function AdminSchedulePage() {
   const [blockedPeriods, setBlockedPeriods] = useState([]);
   const [loading, setLoading] = useState(false);
   const [savingSchedule, setSavingSchedule] = useState(false);
+  
+  // View mode: false = show calendar & date blocking (default), true = show daily time ranges editor
+  const [editingTimeRanges, setEditingTimeRanges] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [newBlock, setNewBlock] = useState({
     start_time: '09:00',
@@ -48,6 +52,7 @@ export default function AdminSchedulePage() {
       await API.put('/admin/schedule-settings/', schedules);
       alert('Weekly schedule hours updated successfully!');
       fetchSchedule();
+      setEditingTimeRanges(false);
     } catch (err) {
       alert('Failed to update weekly schedule.');
     } finally {
@@ -96,166 +101,193 @@ export default function AdminSchedulePage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       
-      {/* HEADER */}
-      <div className="bg-white p-6 border border-luxury-nude shadow-sm">
-        <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-          <Clock size={20} className="text-luxury-pink" /> Operating Hours & Time Ranges
-        </h2>
-        <p className="text-xs text-gray-500 mt-1">Configure standard daily opening/closing time ranges or block out specific dates and times.</p>
-      </div>
-
-      {/* 1. WEEKLY SCHEDULE TIME RANGES EDITOR */}
-      <div className="bg-white p-6 border border-luxury-nude shadow-sm space-y-6">
-        <div className="flex justify-between items-center border-b pb-4">
-          <div>
-            <h3 className="font-serif text-lg font-bold text-luxury-black">Weekly Operating Hours</h3>
-            <p className="text-xs text-gray-500">Edit the active working hours for each day of the week.</p>
-          </div>
-          <button
-            onClick={handleSaveAllSchedules}
-            disabled={savingSchedule}
-            className="bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2 shadow"
-          >
-            {savingSchedule ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} Save Schedule Changes
-          </button>
+      {/* HEADER WITH TOGGLE BUTTON */}
+      <div className="bg-white p-6 border border-luxury-nude shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
+            <Clock size={20} className="text-luxury-pink" /> 
+            {editingTimeRanges ? 'Edit Weekly Operating Hours' : 'Studio Schedule & Date Blocking'}
+          </h2>
+          <p className="text-xs text-gray-500 mt-1">
+            {editingTimeRanges 
+              ? 'Modify standard opening and closing time ranges for each day of the week.' 
+              : 'Block specific dates and holidays from online appointment bookings.'}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {schedules.map((sched, index) => (
-            <div key={sched.id || index} className="p-4 bg-luxury-cream border border-luxury-nude space-y-3">
-              <div className="flex justify-between items-center">
-                <strong className="font-serif text-base text-luxury-black uppercase tracking-wider">{sched.day_of_week}</strong>
-                <div className="flex items-center gap-1.5 text-xs">
-                  <input
-                    type="checkbox"
-                    id={`open-${index}`}
-                    checked={sched.is_open}
-                    onChange={(e) => handleScheduleChange(index, 'is_open', e.target.checked)}
-                  />
-                  <label htmlFor={`open-${index}`} className="font-semibold text-gray-700 cursor-pointer">Open</label>
+        <div>
+          {editingTimeRanges ? (
+            <button
+              onClick={() => setEditingTimeRanges(false)}
+              className="bg-luxury-cream text-luxury-black hover:bg-luxury-nude border border-luxury-nude font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2"
+            >
+              <ArrowLeft size={16} /> Back to Date Blocking
+            </button>
+          ) : (
+            <button
+              onClick={() => setEditingTimeRanges(true)}
+              className="bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2 shadow"
+            >
+              <Settings2 size={16} /> Edit Daily Time Ranges
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* VIEW MODE 1: WEEKLY TIME RANGES EDITOR */}
+      {editingTimeRanges ? (
+        <div className="bg-white p-6 border border-luxury-nude shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b pb-4">
+            <div>
+              <h3 className="font-serif text-lg font-bold text-luxury-black">Weekly Operating Hours</h3>
+              <p className="text-xs text-gray-500">Configure active working hours for Monday through Sunday.</p>
+            </div>
+            <button
+              onClick={handleSaveAllSchedules}
+              disabled={savingSchedule}
+              className="bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2 shadow"
+            >
+              {savingSchedule ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} Save Schedule Changes
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {schedules.map((sched, index) => (
+              <div key={sched.id || index} className="p-4 bg-luxury-cream border border-luxury-nude space-y-3">
+                <div className="flex justify-between items-center">
+                  <strong className="font-serif text-base text-luxury-black uppercase tracking-wider">{sched.day_of_week}</strong>
+                  <div className="flex items-center gap-1.5 text-xs">
+                    <input
+                      type="checkbox"
+                      id={`open-${index}`}
+                      checked={sched.is_open}
+                      onChange={(e) => handleScheduleChange(index, 'is_open', e.target.checked)}
+                    />
+                    <label htmlFor={`open-${index}`} className="font-semibold text-gray-700 cursor-pointer">Open</label>
+                  </div>
                 </div>
+
+                {sched.is_open && (
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-luxury-nude/60">
+                    <div>
+                      <label className="block text-[10px] text-gray-500 uppercase">Opening Time</label>
+                      <input
+                        type="time"
+                        value={sched.start_time || '09:00'}
+                        onChange={(e) => handleScheduleChange(index, 'start_time', e.target.value)}
+                        className="w-full p-2 border bg-white font-mono text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-gray-500 uppercase">Closing Time</label>
+                      <input
+                        type="time"
+                        value={sched.end_time || '18:00'}
+                        onChange={(e) => handleScheduleChange(index, 'end_time', e.target.value)}
+                        className="w-full p-2 border bg-white font-mono text-xs"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        // VIEW MODE 2: BLOCK SPECIFIC DATES / HOLIDAYS (DEFAULT FIRST VIEW)
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-6 bg-white p-6 border border-luxury-nude shadow-sm space-y-4">
+            <h3 className="font-serif text-base font-bold text-luxury-black flex items-center gap-2">
+              <CalendarIcon size={16} className="text-luxury-pink" /> Block Specific Dates / Holidays
+            </h3>
+            <p className="text-xs text-gray-500">Select any date on the calendar to block out appointments.</p>
+            <CalendarPicker
+              selectedDate={selectedDate}
+              onSelectDate={(date) => setSelectedDate(date)}
+              fullBlockedDates={allBlockedDates}
+            />
+          </div>
+
+          <div className="lg:col-span-6 space-y-6">
+            <form onSubmit={handleCreateBlock} className="bg-white p-6 border border-luxury-nude shadow-sm space-y-4">
+              <h3 className="font-serif text-base font-bold text-luxury-black">
+                Add Block for: <span className="font-mono text-luxury-pink">{selectedDate}</span>
+              </h3>
+
+              <div className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  id="fullDay"
+                  checked={newBlock.block_full_day}
+                  onChange={(e) => setNewBlock({ ...newBlock, block_full_day: e.target.checked })}
+                />
+                <label htmlFor="fullDay" className="font-semibold text-gray-700 cursor-pointer">Block Entire Day</label>
               </div>
 
-              {sched.is_open && (
-                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-luxury-nude/60">
+              {!newBlock.block_full_day && (
+                <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
-                    <label className="block text-[10px] text-gray-500 uppercase">Opening Time</label>
+                    <label className="block text-gray-600 mb-1">Start Time Range</label>
                     <input
                       type="time"
-                      value={sched.start_time || '09:00'}
-                      onChange={(e) => handleScheduleChange(index, 'start_time', e.target.value)}
-                      className="w-full p-2 border bg-white font-mono text-xs"
+                      value={newBlock.start_time}
+                      onChange={(e) => setNewBlock({ ...newBlock, start_time: e.target.value })}
+                      className="w-full p-2.5 border font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-gray-500 uppercase">Closing Time</label>
+                    <label className="block text-gray-600 mb-1">End Time Range</label>
                     <input
                       type="time"
-                      value={sched.end_time || '18:00'}
-                      onChange={(e) => handleScheduleChange(index, 'end_time', e.target.value)}
-                      className="w-full p-2 border bg-white font-mono text-xs"
+                      value={newBlock.end_time}
+                      onChange={(e) => setNewBlock({ ...newBlock, end_time: e.target.value })}
+                      className="w-full p-2.5 border font-mono"
                     />
                   </div>
                 </div>
               )}
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* 2. CALENDAR DATE BLOCKING SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-6 bg-white p-6 border border-luxury-nude shadow-sm space-y-4">
-          <h3 className="font-serif text-base font-bold text-luxury-black flex items-center gap-2">
-            <CalendarIcon size={16} className="text-luxury-pink" /> Block Specific Dates / Holidays
-          </h3>
-          <p className="text-xs text-gray-500">Select any date from the calendar to block out appointments.</p>
-          <CalendarPicker
-            selectedDate={selectedDate}
-            onSelectDate={(date) => setSelectedDate(date)}
-            fullBlockedDates={allBlockedDates}
-          />
-        </div>
-
-        <div className="lg:col-span-6 space-y-6">
-          <form onSubmit={handleCreateBlock} className="bg-white p-6 border border-luxury-nude shadow-sm space-y-4">
-            <h3 className="font-serif text-base font-bold text-luxury-black">
-              Add Block for: <span className="font-mono text-luxury-pink">{selectedDate}</span>
-            </h3>
-
-            <div className="flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                id="fullDay"
-                checked={newBlock.block_full_day}
-                onChange={(e) => setNewBlock({ ...newBlock, block_full_day: e.target.checked })}
-              />
-              <label htmlFor="fullDay" className="font-semibold text-gray-700 cursor-pointer">Block Entire Day</label>
-            </div>
-
-            {!newBlock.block_full_day && (
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="block text-gray-600 mb-1">Start Time Range</label>
-                  <input
-                    type="time"
-                    value={newBlock.start_time}
-                    onChange={(e) => setNewBlock({ ...newBlock, start_time: e.target.value })}
-                    className="w-full p-2.5 border font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-600 mb-1">End Time Range</label>
-                  <input
-                    type="time"
-                    value={newBlock.end_time}
-                    onChange={(e) => setNewBlock({ ...newBlock, end_time: e.target.value })}
-                    className="w-full p-2.5 border font-mono"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Reason / Note (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Studio Maintenance, Private Wedding Event"
+                  value={newBlock.reason}
+                  onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
+                  className="w-full p-2.5 border text-xs"
+                />
               </div>
-            )}
 
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">Reason / Note (Optional)</label>
-              <input
-                type="text"
-                placeholder="e.g. Studio Maintenance, Private Wedding Event"
-                value={newBlock.reason}
-                onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
-                className="w-full p-2.5 border text-xs"
-              />
-            </div>
+              <button type="submit" className="w-full bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs py-3 transition-colors">
+                Save Blocked Time / Date
+              </button>
+            </form>
 
-            <button type="submit" className="w-full bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs py-3 transition-colors">
-              Save Blocked Time / Date
-            </button>
-          </form>
-
-          <div className="bg-white p-6 border border-luxury-nude shadow-sm space-y-3">
-            <h3 className="font-serif text-sm font-bold text-luxury-black">Blocks on {selectedDate}</h3>
-            {selectedDateBlocks.length === 0 ? (
-              <p className="text-xs text-gray-400">No blocks configured for this date.</p>
-            ) : (
-              <div className="space-y-2">
-                {selectedDateBlocks.map(block => (
-                  <div key={block.id} className="p-3 bg-luxury-cream border flex justify-between items-center text-xs">
-                    <div>
-                      <strong className="text-luxury-black font-mono">{block.block_full_day ? 'Entire Day Closed' : `${block.start_time} - ${block.end_time}`}</strong>
-                      <p className="text-gray-500 text-[10px]">{block.reason || 'No reason provided'}</p>
+            <div className="bg-white p-6 border border-luxury-nude shadow-sm space-y-3">
+              <h3 className="font-serif text-sm font-bold text-luxury-black">Blocks on {selectedDate}</h3>
+              {selectedDateBlocks.length === 0 ? (
+                <p className="text-xs text-gray-400">No blocks configured for this date.</p>
+              ) : (
+                <div className="space-y-2">
+                  {selectedDateBlocks.map(block => (
+                    <div key={block.id} className="p-3 bg-luxury-cream border flex justify-between items-center text-xs">
+                      <div>
+                        <strong className="text-luxury-black font-mono">{block.block_full_day ? 'Entire Day Closed' : `${block.start_time} - ${block.end_time}`}</strong>
+                        <p className="text-gray-500 text-[10px]">{block.reason || 'No reason provided'}</p>
+                      </div>
+                      <button onClick={() => handleDeleteBlock(block.id)} className="text-red-500 hover:text-red-700 p-1">
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <button onClick={() => handleDeleteBlock(block.id)} className="text-red-500 hover:text-red-700 p-1">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
     </div>
   );
