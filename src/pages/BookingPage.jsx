@@ -13,7 +13,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const preselectedPackageId = searchParams.get('package');
 
-  // Steps: 1 = Package, 2 = Calendar & Time Input, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
+  // Steps: 1 = Package, 2 = Calendar & Starting Time, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
   const [currentStep, setCurrentStep] = useState(1);
 
   // Initial Setup Data State
@@ -26,7 +26,6 @@ export default function BookingPage() {
   const [timelineSegments, setTimelineSegments] = useState([]);
   const [openingTime, setOpeningTime] = useState('');
   const [closingTime, setClosingTime] = useState(''); 
-  const [blockedRanges, setBlockedRanges] = useState([]);
 
   // Package Selection State
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -35,7 +34,6 @@ export default function BookingPage() {
   // Date & Time Selection State
   const [appointmentDate, setAppointmentDate] = useState('');
   const [selectedTime, setSelectedTime] = useState(''); // Input format HH:MM
-  const [calculatedEndTime, setCalculatedEndTime] = useState('');
   const [checkingSlots, setCheckingSlots] = useState(false);
   const [slotError, setSlotError] = useState('');
   const [overlapWarning, setOverlapWarning] = useState('');
@@ -111,48 +109,35 @@ export default function BookingPage() {
       setSlotError('');
       setOverlapWarning('');
       setSelectedTime('');
-      setCalculatedEndTime('');
       
       const res = await API.get(`/check-availability/?date=${appointmentDate}&package_id=${selectedPackage.id}`);
       
       setTimelineSegments(res.data.timeline_segments || []);
       setOpeningTime(res.data.opening_time || '');
       setClosingTime(res.data.closing_time || '');
-      setBlockedRanges(res.data.blocked_ranges || []);
 
       if (!res.data.available && res.data.reason) {
         setSlotError(res.data.reason);
       }
     } catch (err) {
       setTimelineSegments([]);
-      setBlockedRanges([]);
-      setSlotError('Unable to check slot availability for this date.');
+      setSlotError('Unable to check availability for this date.');
     } finally {
       setCheckingSlots(false);
     }
   };
 
-  // Real-time calculation and validation whenever user inputs a time
+  // Check if selected start time touches restricted periods
   const handleTimeInputChange = (inputTime) => {
     setSelectedTime(inputTime);
     setOverlapWarning('');
 
-    if (!inputTime || !selectedPackage) {
-      setCalculatedEndTime('');
-      return;
-    }
+    if (!inputTime) return;
 
-    // 1. Calculate Session End Time (Start Time + Package Duration)
     const [hrs, mins] = inputTime.split(':').map(Number);
     const startTotalMins = hrs * 60 + mins;
-    const endTotalMins = startTotalMins + selectedPackage.duration_minutes;
 
-    const endHrs = String(Math.floor(endTotalMins / 60)).padStart(2, '0');
-    const endMins = String(endTotalMins % 60).padStart(2, '0');
-    const formattedEndTime = `${endHrs}:${endMins}`;
-    setCalculatedEndTime(formattedEndTime);
-
-    // 2. Validate Operating Studio Hours Boundary
+    // 1. Validate Operating Studio Hours Boundaries
     if (openingTime && closingTime) {
       const [opHrs, opMins] = openingTime.split(':').map(Number);
       const [clHrs, clMins] = closingTime.split(':').map(Number);
@@ -164,16 +149,15 @@ export default function BookingPage() {
         return;
       }
 
-      if (endTotalMins > clTotalMins) {
-        setOverlapWarning(`Package duration of ${selectedPackage.duration_minutes} mins exceeds closing time (${closingTime}). Finish time would be ${formattedEndTime}.`);
+      if (startTotalMins >= clTotalMins) {
+        setOverlapWarning(`Studio closes at ${closingTime}. Please choose a time before closing.`);
         return;
       }
     }
 
-    // 3. Validate Overlap with Restricted / Blocked Ranges
+    // 2. Validate if Start Time falls inside Blocked / Restricted Ranges
     for (const segment of timelineSegments) {
       if (segment.type !== 'available' && segment.label) {
-        // Parse range "HH:MM - HH:MM"
         const times = segment.label.split(' - ');
         if (times.length === 2) {
           const [bStartH, bStartM] = times[0].split(':').map(Number);
@@ -181,9 +165,8 @@ export default function BookingPage() {
           const blockStartMins = bStartH * 60 + bStartM;
           const blockEndMins = bEndH * 60 + bEndM;
 
-          // Check if [startTotalMins, endTotalMins) overlaps with [blockStartMins, blockEndMins)
-          if (startTotalMins < blockEndMins && endTotalMins > blockStartMins) {
-            setOverlapWarning(`Chosen window (${inputTime} - ${formattedEndTime}) touches a restricted period: ${segment.label} (${segment.reason}).`);
+          if (startTotalMins >= blockStartMins && startTotalMins < blockEndMins) {
+            setOverlapWarning(`Selected time (${inputTime}) falls inside a restricted range: ${segment.label} (${segment.reason}).`);
             return;
           }
         }
@@ -259,7 +242,7 @@ export default function BookingPage() {
           </h1>
         </div>
 
-        {/* Multi-Step Tracker */}
+        {/* Multi-Step Progress Tracker */}
         {currentStep <= 4 && (
           <div className="flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
             {[
@@ -336,7 +319,7 @@ export default function BookingPage() {
                       <div>
                         <h4 className="font-bold text-sm">{pkg.name}</h4>
                         <p className={`text-xs mt-1 ${selectedPackage?.id === pkg.id ? 'text-gray-300' : 'text-gray-500'}`}>
-                          Duration: {pkg.duration_minutes} Mins • Max {pkg.maximum_people} Person(s)
+                          Max {pkg.maximum_people} Person(s)
                         </p>
                       </div>
                       <span className={`font-serif text-lg font-bold ${selectedPackage?.id === pkg.id ? 'text-luxury-gold' : 'text-luxury-black'}`}>
@@ -358,7 +341,7 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* STEP 2: CALENDAR & FORM INPUT FOR START TIME */}
+        {/* STEP 2: CALENDAR & STARTING HOUR SELECTION */}
         {currentStep === 2 && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
             <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
@@ -375,7 +358,7 @@ export default function BookingPage() {
 
             {checkingSlots && (
               <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
-                <Loader2 className="animate-spin" size={16} /> Loading studio working hours for {appointmentDate}...
+                <Loader2 className="animate-spin" size={16} /> Loading studio schedule for {appointmentDate}...
               </div>
             )}
 
@@ -399,7 +382,7 @@ export default function BookingPage() {
                     <span className="font-mono text-gray-500">{openingTime} - {closingTime}</span>
                   </div>
 
-                  {/* Proportional Multi-Color Timeline Bar */}
+                  {/* Multi-Color Timeline Bar */}
                   <div className="w-full h-8 bg-gray-200 rounded-2xl overflow-hidden flex shadow-inner p-1 gap-1">
                     {timelineSegments.map((seg, idx) => (
                       <div
@@ -423,11 +406,11 @@ export default function BookingPage() {
                   <div className="flex flex-wrap justify-center gap-4 text-[10px] pt-1">
                     <div className="flex items-center gap-1.5">
                       <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
-                      <span className="font-semibold text-gray-700">Available Range</span>
+                      <span className="font-semibold text-gray-700">Available Hours</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="w-3 h-3 rounded-md bg-amber-400"></span>
-                      <span className="font-semibold text-gray-700">Blocked Range / Break</span>
+                      <span className="font-semibold text-gray-700">Blocked / Studio Break</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="w-3 h-3 rounded-md bg-red-800"></span>
@@ -436,15 +419,12 @@ export default function BookingPage() {
                   </div>
                 </div>
 
-                {/* 2. FORM TIME INPUT FIELD & VALIDATION BARRIER */}
+                {/* 2. FORM STARTING HOUR INPUT FIELD */}
                 <div className="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 shadow-sm">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black mb-1">
-                      Enter Desired Starting Time *
+                    <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black mb-1.5">
+                      Enter Desired Starting Hour *
                     </label>
-                    <p className="text-[11px] text-gray-500 mb-2">
-                      Package Duration: <strong>{selectedPackage?.duration_minutes} Mins</strong>
-                    </p>
 
                     <div className="flex items-center gap-3">
                       <input
@@ -454,20 +434,15 @@ export default function BookingPage() {
                         onChange={(e) => handleTimeInputChange(e.target.value)}
                         className="p-3 border border-gray-300 rounded-xl text-sm font-bold font-mono focus:ring-2 focus:ring-luxury-gold focus:outline-none"
                       />
-                      {selectedTime && calculatedEndTime && (
-                        <div className="text-xs font-mono bg-luxury-cream p-2.5 rounded-xl border">
-                          Calculated Window: <strong className="text-luxury-black">{selectedTime} - {calculatedEndTime}</strong>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* OVERLAP / RESTRICTED CONFLICT WARNING */}
+                  {/* RESTRICTED HOUR CONFLICT WARNING */}
                   {overlapWarning && (
                     <div className="p-4 bg-amber-50 text-amber-900 border border-amber-300 rounded-2xl text-xs flex items-start gap-2.5">
                       <AlertTriangle size={18} className="shrink-0 text-amber-600 mt-0.5" />
                       <div>
-                        <strong className="block font-bold">Time Conflict Detected</strong>
+                        <strong className="block font-bold">Time Restricted</strong>
                         <span>{overlapWarning}</span>
                       </div>
                     </div>
@@ -476,7 +451,7 @@ export default function BookingPage() {
                   {!overlapWarning && selectedTime && (
                     <div className="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs flex items-center gap-2">
                       <CheckCircle2 size={16} className="text-emerald-600" />
-                      <span>This start time is available and within open operating hours.</span>
+                      <span>This starting time is available.</span>
                     </div>
                   )}
                 </div>
@@ -494,7 +469,7 @@ export default function BookingPage() {
               </button>
               <button
                 type="button"
-                disabled={!selectedTime || !!overlapWarning || !calculatedEndTime}
+                disabled={!selectedTime || !!overlapWarning}
                 onClick={() => setCurrentStep(3)}
                 className="w-2/3 bg-luxury-gold disabled:bg-gray-200 disabled:text-gray-400 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
               >
