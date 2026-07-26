@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Plus, ArrowLeft, Trash2, Loader2, FolderPlus, Sparkles } from 'lucide-react';
+import { Layers, Plus, ArrowLeft, Trash2, Edit3, Loader2, FolderPlus } from 'lucide-react';
 import API from '../../services/api';
 
 export default function AdminServicesPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Navigation State: null means showing categories list, object means showing packages inside that category
+  // Navigation State: null = categories list, object = packages inside category
   const [activeCategory, setActiveCategory] = useState(null);
 
   // Modals state
   const [showCatModal, setShowCatModal] = useState(false);
   const [showPkgModal, setShowPkgModal] = useState(false);
+  const [editingPkg, setEditingPkg] = useState(null); // Holds package data when editing
 
   // Form states
   const [newCatName, setNewCatName] = useState('');
-  const [newPkg, setNewPkg] = useState({
+  const [pkgForm, setPkgForm] = useState({
     name: '',
     price: '',
     description: '',
@@ -33,7 +34,6 @@ export default function AdminServicesPage() {
       const res = await API.get('/categories-packages/');
       setCategories(res.data);
       
-      // If we are currently viewing a category, update its reference in real-time
       if (activeCategory) {
         const updatedActive = res.data.find(c => c.id === activeCategory.id);
         if (updatedActive) setActiveCategory(updatedActive);
@@ -59,30 +59,58 @@ export default function AdminServicesPage() {
     }
   };
 
-  const handleCreatePackage = async (e) => {
+  const handleOpenAddModal = () => {
+    setEditingPkg(null);
+    setPkgForm({ name: '', price: '', description: '', is_featured: false, image: null });
+    setShowPkgModal(true);
+  };
+
+  const handleOpenEditModal = (pkg) => {
+    setEditingPkg(pkg);
+    setPkgForm({
+      name: pkg.name,
+      price: pkg.price,
+      description: pkg.description || '',
+      is_featured: pkg.is_featured || false,
+      image: null
+    });
+    setShowPkgModal(true);
+  };
+
+  const handleSavePackage = async (e) => {
     e.preventDefault();
     if (!activeCategory) return;
 
     const formData = new FormData();
-    formData.append('name', newPkg.name);
+    formData.append('name', pkgForm.name);
     formData.append('category', activeCategory.id);
-    formData.append('price', newPkg.price);
-    formData.append('description', newPkg.description);
-    formData.append('is_featured', newPkg.is_featured);
-    if (newPkg.image) {
-      formData.append('image', newPkg.image);
+    formData.append('price', pkgForm.price);
+    formData.append('description', pkgForm.description);
+    formData.append('is_featured', pkgForm.is_featured);
+    if (pkgForm.image) {
+      formData.append('image', pkgForm.image);
     }
 
     try {
-      await API.post('/admin/packages/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (editingPkg) {
+        // Update existing package
+        await API.put(`/admin/packages/${editingPkg.id}/`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert('Package updated successfully!');
+      } else {
+        // Create new package
+        await API.post('/admin/packages/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert('Package added successfully!');
+      }
+
       setShowPkgModal(false);
-      setNewPkg({ name: '', price: '', description: '', is_featured: false, image: null });
+      setEditingPkg(null);
       fetchData();
-      alert('Package added successfully!');
     } catch (err) {
-      alert('Failed to create package.');
+      alert('Failed to save package.');
     }
   };
 
@@ -138,7 +166,7 @@ export default function AdminServicesPage() {
         <div>
           {activeCategory ? (
             <button
-              onClick={() => setShowPkgModal(true)}
+              onClick={handleOpenAddModal}
               className="bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black font-nav uppercase tracking-widest text-xs px-6 py-3 transition-colors flex items-center gap-2 shadow"
             >
               <Plus size={16} /> Add Package to {activeCategory.name}
@@ -185,7 +213,7 @@ export default function AdminServicesPage() {
             <div className="bg-white p-12 border border-luxury-nude text-center space-y-3">
               <p className="text-xs text-gray-500">No makeup packages found in this category yet.</p>
               <button
-                onClick={() => setShowPkgModal(true)}
+                onClick={handleOpenAddModal}
                 className="bg-luxury-pink text-luxury-black text-xs font-nav uppercase tracking-wider px-5 py-2.5 font-bold"
               >
                 Add First Package
@@ -216,13 +244,22 @@ export default function AdminServicesPage() {
                       <span className="font-serif font-bold text-lg text-luxury-black">
                         {Number(pkg.price).toLocaleString()} <span className="text-[10px] font-sans text-gray-500">Frw</span>
                       </span>
-                      <button
-                        onClick={() => handleDeletePackage(pkg.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 transition-colors"
-                        title="Delete Package"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleOpenEditModal(pkg)}
+                          className="p-2 text-gray-600 hover:text-luxury-pink transition-colors"
+                          title="Edit Package Details"
+                        >
+                          <Edit3 size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePackage(pkg.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 transition-colors"
+                          title="Delete Package"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -261,21 +298,23 @@ export default function AdminServicesPage() {
         </div>
       )}
 
-      {/* MODAL 2: ADD NEW PACKAGE TO ACTIVE CATEGORY */}
+      {/* MODAL 2: ADD OR EDIT PACKAGE */}
       {showPkgModal && activeCategory && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white max-w-lg w-full p-6 space-y-4 border border-luxury-nude shadow-2xl relative">
             <button onClick={() => setShowPkgModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-luxury-black">✕</button>
-            <h3 className="font-serif text-xl font-bold text-luxury-black">Add Package to {activeCategory.name}</h3>
+            <h3 className="font-serif text-xl font-bold text-luxury-black">
+              {editingPkg ? `Edit Package: ${editingPkg.name}` : `Add Package to ${activeCategory.name}`}
+            </h3>
 
-            <form onSubmit={handleCreatePackage} className="space-y-4 text-xs">
+            <form onSubmit={handleSavePackage} className="space-y-4 text-xs">
               <div>
                 <label className="block font-semibold text-gray-700 mb-1">Package Name</label>
                 <input
                   type="text"
                   required
-                  value={newPkg.name}
-                  onChange={(e) => setNewPkg({ ...newPkg, name: e.target.value })}
+                  value={pkgForm.name}
+                  onChange={(e) => setPkgForm({ ...pkgForm, name: e.target.value })}
                   className="w-full p-3 border"
                   placeholder="e.g. Traditional Wedding Glam"
                 />
@@ -286,8 +325,8 @@ export default function AdminServicesPage() {
                 <input
                   type="number"
                   required
-                  value={newPkg.price}
-                  onChange={(e) => setNewPkg({ ...newPkg, price: e.target.value })}
+                  value={pkgForm.price}
+                  onChange={(e) => setPkgForm({ ...pkgForm, price: e.target.value })}
                   className="w-full p-3 border"
                   placeholder="e.g. 150000"
                 />
@@ -297,19 +336,19 @@ export default function AdminServicesPage() {
                 <label className="block font-semibold text-gray-700 mb-1">Description</label>
                 <textarea
                   rows="3"
-                  value={newPkg.description}
-                  onChange={(e) => setNewPkg({ ...newPkg, description: e.target.value })}
+                  value={pkgForm.description}
+                  onChange={(e) => setPkgForm({ ...pkgForm, description: e.target.value })}
                   className="w-full p-3 border"
                   placeholder="Detail what is included in this service..."
                 ></textarea>
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Package Photo</label>
+                <label className="block font-semibold text-gray-700 mb-1">Package Photo {editingPkg && '(Leave blank to keep current photo)'}</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setNewPkg({ ...newPkg, image: e.target.files[0] })}
+                  onChange={(e) => setPkgForm({ ...pkgForm, image: e.target.files[0] })}
                   className="w-full p-2 border bg-gray-50"
                 />
               </div>
@@ -318,15 +357,17 @@ export default function AdminServicesPage() {
                 <input
                   type="checkbox"
                   id="featured"
-                  checked={newPkg.is_featured}
-                  onChange={(e) => setNewPkg({ ...newPkg, is_featured: e.target.checked })}
+                  checked={pkgForm.is_featured}
+                  onChange={(e) => setPkgForm({ ...pkgForm, is_featured: e.target.checked })}
                 />
                 <label htmlFor="featured" className="font-semibold text-gray-700 cursor-pointer">Mark as Featured Package</label>
               </div>
 
               <div className="flex gap-3 pt-4">
                 <button type="button" onClick={() => setShowPkgModal(false)} className="w-1/2 bg-gray-100 py-3 uppercase tracking-wider font-semibold">Cancel</button>
-                <button type="submit" className="w-1/2 bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black py-3 uppercase tracking-wider font-bold">Save Package</button>
+                <button type="submit" className="w-1/2 bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black py-3 uppercase tracking-wider font-bold">
+                  {editingPkg ? 'Update Package' : 'Save Package'}
+                </button>
               </div>
             </form>
           </div>
