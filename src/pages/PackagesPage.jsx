@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import API from '../services/api';
 
 export default function PackagesPage() {
@@ -137,13 +137,6 @@ export default function PackagesPage() {
                       <p className="text-gray-600 text-xs mt-2.5 leading-relaxed line-clamp-3">
                         {pkg.short_description || pkg.description}
                       </p>
-
-                      {pkg.includes_touch_ups && (
-                        <div className="mt-4 bg-luxury-cream p-2.5 rounded-xl flex items-center gap-2 text-xs text-luxury-black font-medium border border-luxury-nude">
-                          <CheckCircle size={14} className="text-emerald-600 shrink-0" />
-                          <span>Includes Event Touch-ups</span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Pricing & Booking CTA */}
