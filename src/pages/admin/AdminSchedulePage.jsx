@@ -3,7 +3,7 @@ import { Calendar as CalendarIcon, Plus, Trash2, Clock, Save, Loader2, ArrowLeft
 import API from '../../services/api';
 import CalendarPicker from '../../components/CalendarPicker';
 
-// Mapping helper for days of the week (supports both integer strings/numbers and string names)
+// Mapping helper for days of the week (supports numbers 0-6 and string names)
 const DAY_NAMES = {
   '0': 'Monday',
   '1': 'Tuesday',
@@ -12,7 +12,6 @@ const DAY_NAMES = {
   '4': 'Friday',
   '5': 'Saturday',
   '6': 'Sunday',
-  // Fallbacks if already strings
   'monday': 'Monday',
   'tuesday': 'Tuesday',
   'wednesday': 'Wednesday',
@@ -34,7 +33,7 @@ export default function AdminSchedulePage() {
   const [loading, setLoading] = useState(false);
   const [savingSchedule, setSavingSchedule] = useState(false);
   
-  // View mode: false = show calendar & date blocking (default), true = show daily time ranges editor
+  // View mode: false = date blocking view (default), true = daily time ranges editor
   const [editingTimeRanges, setEditingTimeRanges] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -56,8 +55,17 @@ export default function AdminSchedulePage() {
         API.get('/admin/schedule-settings/'),
         API.get('/admin/blocked-periods/')
       ]);
-      setSchedules(schedRes.data);
-      setBlockedPeriods(blockRes.data);
+      
+      // Ensure fallback strings for inputs to prevent controlled/uncontrolled warnings
+      const sanitizedSchedules = (schedRes.data || []).map(s => ({
+        ...s,
+        start_time: s.start_time || '09:00',
+        end_time: s.end_time || '18:00',
+        is_open: !!s.is_open
+      }));
+
+      setSchedules(sanitizedSchedules);
+      setBlockedPeriods(blockRes.data || []);
     } catch (err) {
       console.error('Error loading schedule:', err);
     } finally {
@@ -95,6 +103,12 @@ export default function AdminSchedulePage() {
       await API.post('/admin/blocked-periods/', {
         ...newBlock,
         blocked_date: selectedDate
+      });
+      setNewBlock({
+        start_time: '09:00',
+        end_time: '18:00',
+        block_full_day: false,
+        reason: ''
       });
       fetchSchedule();
       alert('Blocked period successfully added!');
@@ -189,7 +203,7 @@ export default function AdminSchedulePage() {
                     <input
                       type="checkbox"
                       id={`open-${index}`}
-                      checked={sched.is_open}
+                      checked={!!sched.is_open}
                       onChange={(e) => handleScheduleChange(index, 'is_open', e.target.checked)}
                     />
                     <label htmlFor={`open-${index}`} className="font-semibold text-gray-700 cursor-pointer">Open</label>
