@@ -24,8 +24,8 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['"Cormorant Garamond"', 'serif'],
-        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        serif: ['"Cinzel"', 'serif'],            // Tall, regal, editorial titles
+        sans: ['"Outfit"', 'sans-serif'],        // Tall, clean, elegant body text
       },
     },
   },
