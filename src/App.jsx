@@ -18,10 +18,12 @@ import AdminAppointmentsPage from './pages/admin/AdminAppointmentsPage';
 import AdminSchedulePage from './pages/admin/AdminSchedulePage';
 import AdminReportsPage from './pages/admin/AdminReportsPage';
 import AdminServicesPage from './pages/admin/AdminServicesPage';
+import { ToastProvider } from './context/ToastContext';
 
 export default function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <Router>
         <Routes>
           {/* ================= PUBLIC CLIENT ROUTES ================= */}
@@ -55,6 +57,7 @@ export default function App() {
           </Route>
         </Routes>
       </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }

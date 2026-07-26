@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { X, User, Mail, Lock, Loader2, Save } from 'lucide-react';
 import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export default function AdminSettingsModal({ isOpen, onClose }) {
   const { admin } = useAuth();
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     username: admin?.username || '',
     email: admin?.email || '',
@@ -18,7 +20,7 @@ export default function AdminSettingsModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password && formData.password !== formData.confirmPassword) {
-      alert('New passwords do not match.');
+      addToast('New passwords do not match.', 'error');
       return;
     }
 
@@ -29,11 +31,11 @@ export default function AdminSettingsModal({ isOpen, onClose }) {
         email: formData.email,
         password: formData.password || undefined
       });
-      alert(res.data.message || 'Settings updated successfully!');
+      addToast(res.data.message || 'Admin account settings updated successfully!', 'success');
       onClose();
-      window.location.reload(); // Refresh to reflect updated admin session
+      setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to update account settings.');
+      addToast(err.response?.data?.error || 'Failed to update account settings.', 'error');
     } finally {
       setLoading(false);
     }

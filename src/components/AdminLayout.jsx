@@ -193,4 +193,4 @@ export default function AdminLayout() {
       <AdminSettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
     </div>
   );
-}
+}   
