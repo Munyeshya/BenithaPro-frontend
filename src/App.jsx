@@ -9,12 +9,15 @@ import PackagesPage from './pages/PackagesPage';
 import BookingPage from './pages/BookingPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import FloatingMakeupBackground from './components/FloatingMakeupBackground';
+
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen flex flex-col justify-between bg-luxury-cream">
+          <FloatingMakeupBackground />
           <Navbar />
           <main className="flex-grow">
             <Routes>
