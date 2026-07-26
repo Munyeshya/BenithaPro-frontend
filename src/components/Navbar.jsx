@@ -1,171 +1,285 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Scissors, Calendar, User, Menu, X, Sparkles } from 'lucide-react';
+import { User, Settings, LogOut, Sparkles, ChevronDown, Menu, X, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import AdminSettingsModal from './AdminSettingsModal';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { admin, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Track window scroll to toggle top bar visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     logout();
-    navigate('/');
-    setIsOpen(false);
+    navigate('/admin/login');
   };
 
-  const isActive = (path) => location.pathname === path;
+  const navLinks = [
+    { path: '/', label: 'Home' },
+    { path: '/packages', label: 'Packages & Pricing' },
+    { path: '/gallery', label: 'Gallery' },
+    { path: '/track', label: 'Track Appointment' },
+  ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-luxury-black text-white shadow-md border-b border-luxury-charcoal transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full bg-luxury-pink text-luxury-black flex items-center justify-center font-serif font-bold text-lg group-hover:scale-105 transition-transform shadow">
-              B
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-lg font-bold tracking-wider text-white">
-                Benitha<span className="text-luxury-pink">Makeup</span>
-              </span>
-              <span className="text-[9px] uppercase tracking-widest text-gray-400 font-sans">
-                Professional Studio
+    <>
+      <header className="sticky top-0 z-40 shadow-md">
+        
+        {/* TOP ANNOUNCEMENT / CONTACT BAR (Luxury Pink Theme with smooth scroll hide) */}
+        <div 
+          className={`bg-luxury-pink text-luxury-black font-sans text-[11px] font-medium px-4 sm:px-6 lg:px-8 overflow-hidden transition-all duration-300 ease-in-out ${
+            scrolled ? 'max-h-0 py-0 opacity-0' : 'max-h-12 py-1.5 opacity-100'
+          }`}
+        >
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
+                <Sparkles size={12} /> BenithaMakeup Pro Studio • Kigali
               </span>
             </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8 text-xs uppercase tracking-widest font-semibold">
-            {[
-              { path: '/', label: 'Home' },
-              { path: '/packages', label: 'Services & Packages' },
-              { path: '/gallery', label: 'Gallery' },
-              { path: '/track', label: 'Track Appointment' },
-            ].map(({ path, label }) => (
-              <Link
-                key={path}
-                to={path}
-                className={`transition-colors py-2 relative ${
-                  isActive(path) 
-                    ? 'text-luxury-pink font-bold' 
-                    : 'text-gray-300 hover:text-luxury-pink'
-                }`}
-              >
-                {label}
-                {isActive(path) && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-luxury-pink rounded-full"></span>
-                )}
-              </Link>
-            ))}
-          </div>
-
-          {/* Right Actions (Book Now / Admin) */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link
-              to="/book"
-              className="bg-luxury-pink text-luxury-black hover:bg-luxury-pink-light font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-all duration-300 shadow flex items-center gap-2 hover:scale-105"
-            >
-              <Sparkles size={14} /> Book Glam
-            </Link>
-
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/admin/dashboard"
-                  className="bg-luxury-charcoal hover:bg-black text-gray-200 border border-gray-700 text-xs px-4 py-2.5 rounded-full font-semibold transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-xs text-gray-400 hover:text-red-400 transition-colors uppercase tracking-wider font-semibold"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/admin/login"
-                className="p-2 text-gray-400 hover:text-luxury-pink transition-colors rounded-full hover:bg-luxury-charcoal"
-                title="Admin Portal"
-              >
-                <User size={18} />
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-xl bg-luxury-charcoal text-gray-200 hover:text-luxury-pink transition-colors"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-      {/* Mobile Dropdown Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-luxury-black border-t border-luxury-charcoal px-6 py-6 space-y-4 text-sm font-semibold uppercase tracking-wider">
-          {[
-            { path: '/', label: 'Home' },
-            { path: '/packages', label: 'Services & Packages' },
-            { path: '/gallery', label: 'Gallery' },
-            { path: '/track', label: 'Track Appointment' },
-          ].map(({ path, label }) => (
-            <Link
-              key={path}
-              to={path}
-              onClick={() => setIsOpen(false)}
-              className={`block py-2 ${isActive(path) ? 'text-luxury-pink' : 'text-gray-300'}`}
-            >
-              {label}
-            </Link>
-          ))}
-
-          <div className="pt-4 border-t border-luxury-charcoal flex flex-col gap-3">
-            <Link
-              to="/book"
-              onClick={() => setIsOpen(false)}
-              className="w-full bg-luxury-pink text-luxury-black font-bold text-center py-3 rounded-full uppercase tracking-wider text-xs flex items-center justify-center gap-2"
-            >
-              <Sparkles size={14} /> Book Glam
-            </Link>
-
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/admin/dashboard"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full bg-luxury-charcoal text-white text-center py-3 rounded-full text-xs"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-red-400 text-center py-2 text-xs"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/admin/login"
-                onClick={() => setIsOpen(false)}
-                className="w-full text-gray-400 text-center py-2 text-xs"
-              >
-                Admin Portal Login
-              </Link>
-            )}
+            <div className="flex items-center gap-4 text-[10px] sm:text-[11px]">
+              <a href="tel:+250795509978" className="flex items-center gap-1 hover:underline font-semibold">
+                <Phone size={12} /> +250 795 509 978
+              </a>
+              <span className="hidden sm:inline opacity-60">•</span>
+              <a href="mailto:info@benithamakeup.com" className="flex items-center gap-1 hover:underline font-semibold">
+                <Mail size={12} /> info@benithamakeup.com
+              </a>
+            </div>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* MAIN NAVBAR */}
+        <div className="bg-luxury-black text-white border-b border-luxury-charcoal">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            {/* 1. LEFT: Hamburger Menu Button & Logo */}
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-1.5 text-white hover:text-luxury-pink transition-colors focus:outline-none"
+                aria-label="Toggle Mobile Menu"
+              >
+                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+
+              <Link to="/" className="hidden md:flex items-center group">
+                <img 
+                  src="/logo2.svg" 
+                  alt="BenithaMakeup Pro Logo" 
+                  className="h-9 sm:h-10 w-auto object-contain object-left" 
+                />
+              </Link>
+            </div>
+
+            {/* 2. CENTER: Proportional Navigation Links (Hidden on mobile) */}
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 font-sans text-xs uppercase tracking-widest font-light mx-4">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`transition-colors py-1.5 border-b-2 ${
+                      isActive 
+                        ? 'border-luxury-pink text-luxury-pink font-semibold' 
+                        : 'border-transparent text-gray-300 hover:text-luxury-pink'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* 3. RIGHT: Book Appointment & Admin Login / Dropdown */}
+            <div className="hidden md:flex items-center gap-4 shrink-0">
+              <Link
+                to="/book"
+                className="bg-luxury-pink text-luxury-black hover:bg-white font-nav uppercase tracking-widest text-[10px] px-3.5 py-2 transition-colors font-bold shadow flex items-center gap-1.5"
+              >
+                <Sparkles size={14} /> Book Appointment
+              </Link>
+
+              {admin ? (
+                <div className="relative shrink-0" ref={dropdownRef}>
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-2 p-1.5 bg-luxury-charcoal hover:bg-black border border-luxury-nude/30 transition-colors"
+                  >
+                    <div className="w-6 h-6 bg-luxury-pink text-luxury-black flex items-center justify-center font-bold text-xs">
+                      <User size={14} />
+                    </div>
+                    <span className="text-xs font-sans font-medium text-white px-1">
+                      {admin?.username || 'Admin'}
+                    </span>
+                    <ChevronDown size={14} className="text-gray-400" />
+                  </button>
+
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-52 bg-white text-luxury-black border border-luxury-nude shadow-2xl py-1 z-50 text-xs font-sans">
+                      <div className="px-4 py-2 border-b border-gray-100 text-gray-500 text-[10px] uppercase">
+                        Signed in as <strong className="text-luxury-black block truncate">{admin?.username || 'admin'}</strong>
+                      </div>
+
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="w-full text-left px-4 py-2.5 hover:bg-luxury-cream text-gray-700 flex items-center gap-2 uppercase tracking-wider font-semibold"
+                      >
+                        <Sparkles size={14} className="text-luxury-pink" /> Admin Dashboard
+                      </Link>
+
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setSettingsModalOpen(true);
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-luxury-cream text-gray-700 flex items-center gap-2 uppercase tracking-wider"
+                      >
+                        <Settings size={14} /> Account Settings
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2.5 hover:bg-red-50 text-red-600 flex items-center gap-2 uppercase tracking-wider border-t border-gray-100"
+                      >
+                        <LogOut size={14} /> Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/admin/login"
+                  className="text-[10px] text-gray-400 hover:text-luxury-pink uppercase tracking-widest font-sans transition-colors"
+                >
+                  Admin Login
+                </Link>
+              )}
+            </div>
+
+            {/* MOBILE QUICK ACTION */}
+            <div className="flex md:hidden items-center gap-2">
+              <Link
+                to="/book"
+                className="bg-luxury-pink text-luxury-black font-nav uppercase tracking-widest text-[9px] px-3 py-1.5 font-bold flex items-center gap-1 shadow"
+              >
+                <Sparkles size={12} /> Book
+              </Link>
+            </div>
+
+          </div>
+        </div>
+
+        {/* MOBILE COLLAPSIBLE MENU */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-luxury-black border-t border-luxury-charcoal px-6 py-5 space-y-4 shadow-2xl">
+            <nav className="flex flex-col space-y-2 font-sans text-xs uppercase tracking-widest">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`py-2 px-3 transition-colors ${
+                      isActive 
+                        ? 'bg-luxury-pink text-luxury-black font-bold' 
+                        : 'text-gray-300 hover:bg-luxury-charcoal hover:text-luxury-pink'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="pt-3 border-t border-luxury-charcoal space-y-3 font-sans text-xs uppercase tracking-widest">
+              <Link
+                to="/book"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full bg-luxury-pink text-luxury-black font-bold p-2.5 flex items-center justify-center gap-2 shadow text-center"
+              >
+                <Sparkles size={14} /> Book Appointment
+              </Link>
+
+              {admin ? (
+                <div className="space-y-2 pt-2">
+                  <div className="text-[10px] text-gray-400 flex items-center gap-2 pb-1">
+                    <User size={14} className="text-luxury-pink" /> Signed in as <strong>{admin?.username}</strong>
+                  </div>
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-left p-2 bg-luxury-charcoal text-luxury-pink flex items-center gap-2 font-semibold"
+                  >
+                    <Sparkles size={14} /> Admin Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setSettingsModalOpen(true);
+                    }}
+                    className="w-full text-left p-2 bg-luxury-charcoal text-gray-300 hover:text-white flex items-center gap-2"
+                  >
+                    <Settings size={14} /> Account Settings
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full text-left p-2 bg-red-950/50 text-red-400 flex items-center gap-2"
+                  >
+                    <LogOut size={14} /> Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/admin/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-2 px-3 text-gray-400 hover:text-luxury-pink transition-colors text-center bg-luxury-charcoal/50"
+                >
+                  Admin Login
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Admin Settings Modal */}
+      <AdminSettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+    </>
   );
 }

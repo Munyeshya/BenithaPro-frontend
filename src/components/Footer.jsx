@@ -7,11 +7,15 @@ export default function Footer() {
     <footer className="bg-luxury-black text-gray-300 pt-16 pb-8 border-t border-luxury-charcoal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
         
-        {/* Brand */}
+        {/* Brand with proportioned logo2.svg */}
         <div className="space-y-4">
-          <h3 className="font-serif text-2xl font-bold text-white tracking-wider">
-            BENITHA<span className="text-luxury-gold font-sans font-light text-xl">MAKEUP</span>
-          </h3>
+          <Link to="/" className="block">
+            <img 
+              src="/logo2.svg" 
+              alt="BenithaMakeup Pro Logo" 
+              className="h-14 sm:h-16 w-auto object-contain object-left"
+            />
+          </Link>
           <p className="text-xs text-gray-400 leading-relaxed">
             Professional makeup artistry based in Kigali, Rwanda. Dedicated to enhancing natural elegance for weddings, graduations, photoshoots, and special moments.
           </p>

@@ -28,22 +28,20 @@ export default function HomePage() {
 
       if (isDeleting) {
         setCurrentText(fullText.substring(0, currentText.length - 1));
-        setTypingSpeed(75); // Faster when deleting
+        setTypingSpeed(75);
       } else {
         setCurrentText(fullText.substring(0, currentText.length + 1));
-        setTypingSpeed(150); // Standard typing speed
+        setTypingSpeed(150);
       }
 
-      // If word is completely typed, pause before deleting
       if (!isDeleting && currentText === fullText) {
-        setTimeout(() => setIsDeleting(true), 2000); // Wait 2s at full word
+        setTimeout(() => setIsDeleting(true), 2000);
         setTypingSpeed(75);
       } 
-      // If word is completely deleted, move to next phrase
       else if (isDeleting && currentText === "") {
         setIsDeleting(false);
         setPhraseIndex((prev) => (prev + 1) % phrases.length);
-        setTypingSpeed(500); // Brief pause before starting next word
+        setTypingSpeed(500);
       }
     };
 
@@ -51,13 +49,8 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, phraseIndex, typingSpeed]);
 
-  // State for Interactive Before/After Slider
   const [sliderPosition, setSliderPosition] = useState(50);
-
-  // State for Portfolio Filter Tab
   const [portfolioTab, setPortfolioTab] = useState('all');
-
-  // State for FAQ Accordion
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -99,17 +92,17 @@ export default function HomePage() {
   return (
     <MotionWrapper className="bg-luxury-cream text-luxury-black font-sans">
       
-      {/* 1. HERO SECTION WITH TYPEWRITER EFFECT */}
-      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden bg-luxury-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* 1. VIEWPORT-LOCKED HERO SECTION WITH DIAGONAL ROUNDED CORNERS */}
+      <section className="relative w-full min-h-[calc(100vh-5.5rem)] flex items-center overflow-hidden bg-luxury-black text-white py-8 lg:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left z-10">
-            <div className="inline-flex items-center gap-2 bg-luxury-pink/10 border border-luxury-pink/30 px-4 py-1.5 text-luxury-pink text-xs font-semibold uppercase tracking-widest font-nav">
+          <div className="lg:col-span-7 space-y-4 text-center lg:text-left z-10">
+            <div className="inline-flex items-center gap-1.5 bg-luxury-pink/10 border border-luxury-pink/30 px-3.5 py-1.5 text-luxury-pink text-xs font-semibold uppercase tracking-widest font-nav">
               <Sparkles size={14} /> Premier Makeup Artistry in Kigali
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
+            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
               Beauty, Perfected <br />
               <span className="text-luxury-pink italic font-normal inline-block">
                 {currentText}
@@ -117,27 +110,27 @@ export default function HomePage() {
               </span>
             </h1>
 
-            <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl mx-auto lg:mx-0">
+            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
               Enhancing natural elegance with bespoke bridal, event, and editorial glam. Crafted for confidence, photographs, and unforgettable memories.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
               <Link 
                 to="/book" 
-                className="w-full sm:w-auto bg-luxury-pink hover:bg-luxury-pink-light text-luxury-black font-nav font-bold text-xs uppercase tracking-widest px-8 py-4 transition-all shadow-xl flex items-center justify-center gap-2 hover:scale-105"
+                className="w-full sm:w-auto bg-luxury-pink hover:bg-luxury-pink-light text-luxury-black font-nav font-bold text-xs uppercase tracking-widest px-7 py-3.5 transition-all shadow-xl flex items-center justify-center gap-2 hover:scale-105"
               >
                 <Calendar size={16} /> Book Your Session
               </Link>
               <Link 
                 to="/packages" 
-                className="w-full sm:w-auto bg-transparent border border-white/30 hover:border-luxury-pink text-white hover:text-luxury-pink font-nav font-semibold text-xs uppercase tracking-widest px-8 py-4 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-transparent border border-white/30 hover:border-luxury-pink text-white hover:text-luxury-pink font-nav font-semibold text-xs uppercase tracking-widest px-7 py-3.5 transition-all flex items-center justify-center gap-2"
               >
                 Explore Pricing <ArrowRight size={16} />
               </Link>
             </div>
 
             {/* Social Trust Badges */}
-            <div className="pt-8 border-t border-white/10 flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-400 font-nav uppercase tracking-wider">
+            <div className="pt-4 border-t border-white/10 flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-400 font-nav uppercase tracking-wider">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck size={16} className="text-luxury-pink" /> Certified Hygiene
               </div>
@@ -147,15 +140,17 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right Image Column */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
-              <div className="absolute -inset-1 bg-gradient-to-r from-luxury-pink to-luxury-pink-dark blur opacity-30"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=1000&auto=format&fit=crop" 
-                alt="BenithaMakeup Pro Editorial Portrait" 
-                className="relative shadow-2xl object-cover w-full h-[480px] lg:h-[540px] border border-white/10"
-              />
+          {/* Right Image Column with Diagonal Rounded Corners */}
+          <div className="lg:col-span-5 relative flex justify-center items-center">
+            <div className="relative mx-auto max-w-xs sm:max-w-sm lg:max-w-none w-full">
+              <div className="absolute -inset-1 bg-gradient-to-r from-luxury-pink to-luxury-pink-dark blur opacity-30 rounded-tl-[60px] rounded-br-[60px]"></div>
+              <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[460px] shadow-2xl border border-white/10 overflow-hidden rounded-tl-[60px] rounded-br-[60px]">
+                <img 
+                  src="https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=1000&auto=format&fit=crop" 
+                  alt="BenithaMakeup Pro Editorial Portrait" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
 
