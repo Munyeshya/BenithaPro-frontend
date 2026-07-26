@@ -4,6 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-luxury-cream text-luxury-black font-sans antialiased selection:bg-luxury-rosegold selection:text-white;
+@layer base {
+  body {
+    background-color: #FFF9FB; /* Soft luxury pink-ivory background */
+    color: #111111;            /* Jet black text */
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
 }

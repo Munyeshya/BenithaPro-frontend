@@ -8,19 +8,25 @@ export default {
     extend: {
       colors: {
         luxury: {
-          black: "#111111",      // Deep charcoal black for headers & elegance
-          charcoal: "#1A1A1A",   // Soft charcoal backgrounds
-          cream: "#FAF7F2",      // Warm pearl ivory / cream background
-          gold: "#D4AF37",       // Classic champagne gold
-          rosegold: "#E0A96D",   // Rose gold accent
-          nude: "#F3E8DF",       // Soft nude card tint
-          burgundy: "#581825",   // Rich accent color
+          black: '#111111',      // Pure jet black
+          charcoal: '#1A1A1A',   // Soft charcoal
+          white: '#FFFFFF',      // Crisp white
+          cream: '#FFF9FB',      // Soft pearl pinkish-ivory tint
+          nude: '#FCE7EC',       // Light romantic pink card tint
+          pink: {
+            light: '#FFD1DC',    // Soft pastel pink
+            DEFAULT: '#FF69B4',  // Vibrant chic pink (Too Faced inspired)
+            hot: '#FF1493',      // Deep bold magenta pink
+            rose: '#E8A4C9',     // Dusty rose pink
+          },
+          gold: '#FF69B4',       // Replaced gold utility classes with primary pink
+          rosegold: '#E8A4C9',   // Replaced rose gold with dusty rose
         }
       },
       fontFamily: {
-        serif: ['Playfair Display', 'serif'],  // Editorial luxury headings
-        sans: ['Inter', 'sans-serif'],          // Clean body typography
-      }
+        serif: ['"Playfair Display"', 'serif'],
+        sans: ['Inter', 'sans-serif'],
+      },
     },
   },
   plugins: [],
