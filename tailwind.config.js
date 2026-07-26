@@ -14,13 +14,13 @@ export default {
           cream: '#FFF9FB',      // Soft pearl pinkish-ivory tint
           nude: '#FCE7EC',       // Light romantic pink card tint
           pink: {
-            light: '#FFD1DC',    // Soft pastel pink
-            DEFAULT: '#FF69B4',  // Vibrant chic pink (Too Faced inspired)
-            hot: '#FF1493',      // Deep bold magenta pink
-            rose: '#E8A4C9',     // Dusty rose pink
+            light: '#FFB6C1',    // Light blush pink
+            DEFAULT: '#FF69B4',  // Standard chic pink
+            dark: '#C71585',     // Deeper dramatic dark pink / magenta
+            berry: '#880E4F',    // Deep luxury dark berry pink
           },
-          gold: '#FF69B4',       // Replaced gold utility classes with primary pink
-          rosegold: '#E8A4C9',   // Replaced rose gold with dusty rose
+          gold: '#FF69B4',       // Primary pink accent
+          rosegold: '#C71585',   // Darker pink accent substitute
         }
       },
       fontFamily: {
