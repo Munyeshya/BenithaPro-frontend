@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, Calendar, Layers, 
-  FileText, BarChart3, LogOut, Sparkles, User, Menu, X, Settings 
+  FileText, BarChart3, LogOut, Sparkles, User, Menu, X, Settings, ImageIcon 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AdminSettingsModal from './AdminSettingsModal';
@@ -38,8 +38,8 @@ export default function AdminLayout() {
     { path: '/admin/schedule', label: 'Operating Hours', icon: Calendar },
     { path: '/admin/reports', label: 'Reports & Analytics', icon: BarChart3 },
     { path: '/admin/services', label: 'Manage Services', icon: Layers },
+    { path: '/admin/media', label: 'Media & Gallery', icon: ImageIcon },
     { path: '/packages', label: 'View Public Shop', icon: Sparkles },
-    { path: '/admin/media', label: 'Media & Gallery', icon: Image },
   ];
 
   return (
@@ -194,4 +194,4 @@ export default function AdminLayout() {
       <AdminSettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
     </div>
   );
-}   
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Plus, Trash2, Loader2, Sparkles } from 'lucide-react';
+import { ImageIcon, Plus, Trash2, Loader2, Sparkles } from 'lucide-react';
 import API from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 
@@ -119,7 +119,7 @@ export default function AdminMediaManagerPage() {
       <div className="bg-white p-6 border border-luxury-nude shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-            <Image size={20} className="text-luxury-pink" /> Portfolio & Gallery Manager
+            <ImageIcon size={20} className="text-luxury-pink" /> Portfolio & Gallery Manager
           </h2>
           <p className="text-gray-500 mt-1">Upload and manage studio gallery shots and before-and-after transformations.</p>
         </div>
