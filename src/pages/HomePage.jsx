@@ -153,6 +153,27 @@ export default function HomePage() {
         <div className="hidden lg:block absolute right-8 bottom-8 z-10 text-[10px] text-white/60 uppercase tracking-[0.3em] font-nav [writing-mode:vertical-rl]">
           BenithaMakeup Pro · Kigali
         </div>
+
+        {/* Liquid black-and-pink transition into the next section */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1440 110"
+          preserveAspectRatio="none"
+          className="absolute z-20 -bottom-px left-0 w-full h-16 sm:h-20 lg:h-24 pointer-events-none"
+        >
+          <path
+            fill="#FFF9FB"
+            d="M0 50 C90 43 142 56 205 51 C224 49 231 54 235 75 C238 96 254 98 260 76 C266 53 276 48 302 51 C390 61 452 42 545 50 C578 53 592 59 598 84 C602 103 619 104 624 82 C630 57 643 50 676 52 C759 58 830 44 910 50 C936 52 945 58 951 75 C956 91 969 91 974 73 C980 54 993 48 1020 50 C1092 57 1165 43 1235 50 C1261 52 1272 60 1278 86 C1283 105 1298 105 1303 84 C1309 58 1323 50 1351 51 C1385 52 1412 48 1440 45 L1440 110 L0 110 Z"
+          />
+          <path
+            fill="#FF69B4"
+            d="M0 42 C88 35 150 47 220 41 C252 38 281 41 314 45 C388 54 465 34 546 42 C574 45 586 50 590 67 C594 83 606 85 612 69 C619 48 633 42 661 43 C746 49 821 37 907 42 C940 44 955 49 961 62 C966 74 978 74 983 60 C990 44 1006 40 1035 42 C1116 49 1185 36 1261 42 C1290 44 1302 51 1308 68 C1313 82 1324 81 1329 66 C1336 47 1351 41 1379 42 C1402 43 1421 40 1440 38 L1440 48 C1416 52 1393 55 1368 53 C1352 52 1345 58 1341 74 C1335 98 1307 98 1300 75 C1295 58 1286 54 1267 53 C1187 48 1118 61 1033 53 C1016 52 1007 57 1003 68 C994 94 958 94 950 70 C946 58 936 54 914 53 C828 48 752 61 660 54 C643 53 634 58 630 76 C623 103 588 102 581 74 C578 59 569 55 549 53 C468 46 390 65 311 55 C281 51 256 49 226 52 C150 58 87 47 0 54 Z"
+            opacity="0.9"
+          />
+          <circle cx="350" cy="66" r="5" fill="#FF69B4" opacity="0.85" />
+          <circle cx="1048" cy="73" r="4" fill="#C71585" opacity="0.9" />
+          <circle cx="1188" cy="62" r="3" fill="#FFB6C1" opacity="0.85" />
+        </svg>
       </section>
 
       {/* 2. SIGNATURE BRIDAL SHOWCASE */}
