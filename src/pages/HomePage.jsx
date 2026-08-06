@@ -96,68 +96,62 @@ export default function HomePage() {
   return (
     <MotionWrapper className="bg-luxury-cream text-luxury-black font-sans">
       
-      {/* 1. VIEWPORT-LOCKED HERO SECTION WITH DIAGONAL ROUNDED CORNERS */}
-      <section className="relative w-full min-h-[calc(100vh-5.5rem)] flex items-center overflow-hidden bg-luxury-black text-white py-8 lg:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-4 text-center lg:text-left z-10">
-            <div className="inline-flex items-center gap-1.5 bg-luxury-pink/10 border border-luxury-pink/30 px-3.5 py-1.5 text-luxury-pink text-xs font-semibold uppercase tracking-widest font-nav">
-              <Sparkles size={14} /> Premier Makeup Artistry in Kigali
+      {/* 1. CINEMATIC CAMPAIGN HERO */}
+      <section className="relative min-h-[calc(100svh-5.5rem)] overflow-hidden bg-luxury-black text-white flex items-center">
+        <img
+          src={heroPortrait}
+          alt="BenithaMakeup Pro bridal makeup portrait"
+          className="absolute inset-0 w-full h-full object-cover object-[68%_center] sm:object-[64%_center] lg:object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
+        <div className="absolute left-0 top-0 h-full w-1.5 bg-luxury-pink"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 w-full">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 border-l-2 border-luxury-pink pl-3 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav">
+              <Sparkles size={14} /> Luxury Makeup Artistry · Kigali
             </div>
 
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-              Beauty, Perfected <br />
-              <span className="text-luxury-pink italic font-normal inline-block">
-                {currentText}
-                <span className="animate-pulse ml-1 border-r-2 border-luxury-pink"></span>
-              </span>
+            <h1 className="font-serif text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.93] mt-6 drop-shadow-2xl">
+              Your beauty,
+              <span className="block text-luxury-pink italic font-normal mt-2">beautifully yours.</span>
             </h1>
 
-            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Enhancing natural elegance with bespoke bridal, event, and editorial glam. Crafted for confidence, photographs, and unforgettable memories.
+            <div className="mt-6 flex items-center gap-3 text-white/75 text-xs sm:text-sm uppercase tracking-[0.18em] font-nav">
+              <span className="w-8 sm:w-12 h-px bg-luxury-pink"></span>
+              <span className="min-h-5">{currentText}<span className="animate-pulse text-luxury-pink">|</span></span>
+            </div>
+
+            <p className="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl mt-6">
+              Bespoke bridal, event, and editorial glam designed to celebrate your complexion, your features, and your moment.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
-              <Link 
-                to="/book" 
-                className="w-full sm:w-auto bg-luxury-pink hover:bg-luxury-pink-light text-luxury-black font-nav font-bold text-xs uppercase tracking-widest px-7 py-3.5 transition-all shadow-xl flex items-center justify-center gap-2 hover:scale-105"
+            <div className="flex flex-col sm:flex-row gap-3 mt-8 max-w-lg">
+              <Link
+                to="/book"
+                className="bg-luxury-pink hover:bg-white text-luxury-black font-nav font-bold text-xs uppercase tracking-[0.16em] px-7 py-4 transition-all flex items-center justify-center gap-2 shadow-2xl"
               >
-                <Calendar size={16} /> Book Your Session
+                <Calendar size={16} /> Reserve Your Session
               </Link>
-              <Link 
-                to="/packages" 
-                className="w-full sm:w-auto bg-transparent border border-white/30 hover:border-luxury-pink text-white hover:text-luxury-pink font-nav font-semibold text-xs uppercase tracking-widest px-7 py-3.5 transition-all flex items-center justify-center gap-2"
+              <Link
+                to="/gallery"
+                className="bg-black/30 backdrop-blur-sm border border-white/35 hover:border-luxury-pink text-white hover:text-luxury-pink font-nav font-bold text-xs uppercase tracking-[0.16em] px-7 py-4 transition-all flex items-center justify-center gap-2"
               >
-                Explore Pricing <ArrowRight size={16} />
+                View Our Work <ArrowRight size={16} />
               </Link>
             </div>
 
-            {/* Social Trust Badges */}
-            <div className="pt-4 border-t border-white/10 flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-400 font-nav uppercase tracking-wider">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck size={16} className="text-luxury-pink" /> Certified Hygiene
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Star size={16} className="text-luxury-pink fill-luxury-pink" /> 5.0 Rated Brides
-              </div>
+            <div className="grid grid-cols-2 sm:flex gap-x-6 gap-y-3 mt-10 pt-5 border-t border-white/15 max-w-xl text-[10px] sm:text-xs text-white/70 font-nav uppercase tracking-wider">
+              <div className="flex items-center gap-2"><ShieldCheck size={15} className="text-luxury-pink" /> Hygienic Studio</div>
+              <div className="flex items-center gap-2"><Star size={15} className="text-luxury-pink" /> Bridal Specialist</div>
+              <div className="flex items-center gap-2 col-span-2"><CheckCircle size={15} className="text-luxury-pink" /> Studio & On-location</div>
             </div>
           </div>
+        </div>
 
-          {/* Right Image Column with Diagonal Rounded Corners */}
-          <div className="lg:col-span-5 relative flex justify-center items-center">
-            <div className="relative mx-auto max-w-xs sm:max-w-sm lg:max-w-none w-full">
-              <div className="absolute -inset-1 bg-gradient-to-r from-luxury-pink to-luxury-pink-dark blur opacity-30 rounded-tl-[60px] rounded-br-[60px]"></div>
-              <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[460px] shadow-2xl border border-white/10 overflow-hidden rounded-tl-[60px] rounded-br-[60px]">
-                <img 
-                  src={heroPortrait}
-                  alt="BenithaMakeup Pro Editorial Portrait" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-
+        <div className="hidden lg:block absolute right-8 bottom-8 z-10 text-[10px] text-white/60 uppercase tracking-[0.3em] font-nav [writing-mode:vertical-rl]">
+          BenithaMakeup Pro · Kigali
         </div>
       </section>
 
