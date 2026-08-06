@@ -105,8 +105,6 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/5"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
-        <div className="absolute left-0 top-0 h-full w-1.5 bg-luxury-pink"></div>
-
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 border-l-2 border-luxury-pink pl-3 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav">
