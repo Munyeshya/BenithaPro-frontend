@@ -377,10 +377,23 @@ export default function HomePage() {
         href="https://wa.me/250795509978"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-emerald-600 hover:bg-emerald-700 text-white p-4 shadow-2xl flex items-center justify-center transition-all hover:scale-110"
+        className="whatsapp-float group fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-50 flex items-center gap-3"
         title="Chat on WhatsApp"
+        aria-label="Chat with BenithaMakeup Pro on WhatsApp"
       >
-        <MessageCircle size={26} />
+        <span className="hidden sm:block bg-luxury-black/95 border border-luxury-pink/40 text-white px-4 py-2.5 shadow-2xl opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
+          <span className="block text-[9px] uppercase tracking-[0.2em] text-luxury-pink font-nav font-bold">Need help?</span>
+          <span className="block text-xs font-semibold mt-0.5 whitespace-nowrap">Chat with us</span>
+        </span>
+
+        <span className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center">
+          <span className="absolute inset-0 rounded-full border border-luxury-pink/50 whatsapp-ring"></span>
+          <span className="absolute inset-1 rounded-full bg-luxury-pink/20 animate-ping"></span>
+          <span className="relative h-full w-full rounded-full bg-luxury-black border-2 border-luxury-pink text-luxury-pink shadow-[0_10px_35px_rgba(255,105,180,0.4)] flex items-center justify-center transition-all duration-300 group-hover:bg-luxury-pink group-hover:text-luxury-black group-hover:rotate-[-8deg] group-hover:scale-105">
+            <MessageCircle size={27} strokeWidth={2.2} />
+            <span className="absolute top-1 right-1.5 h-2.5 w-2.5 rounded-full bg-luxury-pink border-2 border-luxury-black group-hover:bg-white"></span>
+          </span>
+        </span>
       </a>
 
     </MotionWrapper>

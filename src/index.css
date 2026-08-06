@@ -36,3 +36,27 @@
     padding: 10px;
   }
 }
+@keyframes whatsapp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes whatsapp-ring {
+  0% { transform: scale(0.95); opacity: 0.75; }
+  70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+
+.whatsapp-float {
+  animation: whatsapp-float 3.2s ease-in-out infinite;
+}
+
+.whatsapp-ring {
+  animation: whatsapp-ring 2.2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-float,
+  .whatsapp-ring {
+    animation: none;
+  }
+}
