@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, Calendar, ArrowRight, CheckCircle, 
@@ -10,48 +10,8 @@ import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
 import bridalPortrait from '../assets/makeup-bridal.webp';
 
-const phrases = [
-  "Bridal Glam",
-  "Editorial Shoots",
-  "Event Makeup",
-  "Private Sessions"
-];
-
 export default function HomePage() {
   const navigate = useNavigate();
-
-  // True Typewriter Typing Effect State
-  const [currentText, setCurrentText] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(150);
-
-  useEffect(() => {
-    const handleTyping = () => {
-      const fullText = phrases[phraseIndex];
-
-      if (isDeleting) {
-        setCurrentText(fullText.substring(0, currentText.length - 1));
-        setTypingSpeed(75);
-      } else {
-        setCurrentText(fullText.substring(0, currentText.length + 1));
-        setTypingSpeed(150);
-      }
-
-      if (!isDeleting && currentText === fullText) {
-        setTimeout(() => setIsDeleting(true), 2000);
-        setTypingSpeed(75);
-      } 
-      else if (isDeleting && currentText === "") {
-        setIsDeleting(false);
-        setPhraseIndex((prev) => (prev + 1) % phrases.length);
-        setTypingSpeed(500);
-      }
-    };
-
-    const timer = setTimeout(handleTyping, typingSpeed);
-    return () => clearTimeout(timer);
-  }, [currentText, isDeleting, phraseIndex, typingSpeed]);
 
   const [sliderPosition, setSliderPosition] = useState(50);
   const [portfolioTab, setPortfolioTab] = useState('all');
@@ -106,23 +66,25 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/5"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12 w-full">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 border-l-2 border-luxury-pink pl-3 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav">
-              <Sparkles size={14} /> Luxury Makeup Artistry · Kigali
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-luxury-pink/10 border border-luxury-pink/35 px-3.5 py-2 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav backdrop-blur-sm">
+              <Sparkles size={14} /> Skin-first artistry · Kigali
             </div>
 
-            <h1 className="font-serif text-[clamp(2.75rem,8vh,6rem)] font-bold tracking-[-0.04em] leading-[0.93] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
-              Your beauty,
-              <span className="block text-luxury-pink italic font-normal mt-2">beautifully yours.</span>
+            <h1 className="font-serif text-[clamp(2.75rem,7.5vh,5.6rem)] font-bold tracking-[-0.045em] leading-[0.94] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
+              Makeup that feels
+              <span className="block text-luxury-pink italic font-normal mt-2">like you—elevated.</span>
             </h1>
 
-            <div className="mt-[clamp(1rem,2.5vh,1.5rem)] flex items-center gap-3 text-white/75 text-xs sm:text-sm uppercase tracking-[0.18em] font-nav">
-              <span className="w-8 sm:w-12 h-px bg-luxury-pink"></span>
-              <span className="min-h-5">{currentText}<span className="animate-pulse text-luxury-pink">|</span></span>
+            <div className="mt-[clamp(1rem,2.5vh,1.5rem)] flex flex-wrap items-center gap-x-3 gap-y-2 text-white/75 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-nav">
+              <span>Bridal</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
+              <span>Events</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
+              <span>Editorial</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
+              <span>Private sessions</span>
             </div>
 
             <p className="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl mt-[clamp(1rem,2.5vh,1.5rem)]">
-              Bespoke bridal, event, and editorial glam designed to celebrate your complexion, your features, and your moment.
+              Polished, camera-ready beauty tailored to your complexion and features—never a mask, always unmistakably you.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-[clamp(1.25rem,3vh,2rem)] max-w-lg">
