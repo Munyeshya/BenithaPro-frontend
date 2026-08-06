@@ -97,7 +97,7 @@ export default function HomePage() {
     <MotionWrapper className="bg-luxury-cream text-luxury-black font-sans">
       
       {/* 1. CINEMATIC CAMPAIGN HERO */}
-      <section className="relative min-h-[calc(100svh-5.5rem)] overflow-hidden bg-luxury-black text-white flex items-center">
+      <section className="relative h-[calc(100svh-5.75rem)] min-h-0 overflow-hidden bg-luxury-black text-white flex items-center">
         <img
           src={heroPortrait}
           alt="BenithaMakeup Pro bridal makeup portrait"
@@ -107,27 +107,27 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
         <div className="absolute left-0 top-0 h-full w-1.5 bg-luxury-pink"></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 border-l-2 border-luxury-pink pl-3 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav">
               <Sparkles size={14} /> Luxury Makeup Artistry · Kigali
             </div>
 
-            <h1 className="font-serif text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.93] mt-6 drop-shadow-2xl">
+            <h1 className="font-serif text-[clamp(2.75rem,8vh,6rem)] font-bold tracking-[-0.04em] leading-[0.93] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
               Your beauty,
               <span className="block text-luxury-pink italic font-normal mt-2">beautifully yours.</span>
             </h1>
 
-            <div className="mt-6 flex items-center gap-3 text-white/75 text-xs sm:text-sm uppercase tracking-[0.18em] font-nav">
+            <div className="mt-[clamp(1rem,2.5vh,1.5rem)] flex items-center gap-3 text-white/75 text-xs sm:text-sm uppercase tracking-[0.18em] font-nav">
               <span className="w-8 sm:w-12 h-px bg-luxury-pink"></span>
               <span className="min-h-5">{currentText}<span className="animate-pulse text-luxury-pink">|</span></span>
             </div>
 
-            <p className="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl mt-6">
+            <p className="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl mt-[clamp(1rem,2.5vh,1.5rem)]">
               Bespoke bridal, event, and editorial glam designed to celebrate your complexion, your features, and your moment.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-8 max-w-lg">
+            <div className="flex flex-col sm:flex-row gap-3 mt-[clamp(1.25rem,3vh,2rem)] max-w-lg">
               <Link
                 to="/book"
                 className="bg-luxury-pink hover:bg-white text-luxury-black font-nav font-bold text-xs uppercase tracking-[0.16em] px-7 py-4 transition-all flex items-center justify-center gap-2 shadow-2xl"
@@ -142,7 +142,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:flex gap-x-6 gap-y-3 mt-10 pt-5 border-t border-white/15 max-w-xl text-[10px] sm:text-xs text-white/70 font-nav uppercase tracking-wider">
+            <div className="grid grid-cols-2 sm:flex gap-x-6 gap-y-3 mt-[clamp(1.25rem,3vh,2.5rem)] pt-4 border-t border-white/15 max-w-xl text-[10px] sm:text-xs text-white/70 font-nav uppercase tracking-wider [@media(max-height:680px)]:hidden">
               <div className="flex items-center gap-2"><ShieldCheck size={15} className="text-luxury-pink" /> Hygienic Studio</div>
               <div className="flex items-center gap-2"><Star size={15} className="text-luxury-pink" /> Bridal Specialist</div>
               <div className="flex items-center gap-2 col-span-2"><CheckCircle size={15} className="text-luxury-pink" /> Studio & On-location</div>
