@@ -4,6 +4,7 @@ import { Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import API from '../services/api';
 import MotionWrapper from '../components/MotionWrapper';
+import { demoCategories } from '../data/demoData';
 
 export default function PackagesPage() {
   const [categories, setCategories] = useState([]);
@@ -24,7 +25,8 @@ export default function PackagesPage() {
       setError(null);
     } catch (err) {
       console.error('Failed to load packages:', err);
-      setError('Unable to load packages. Please check backend connection.');
+      setCategories(demoCategories);
+      setError(null);
     } finally {
       setLoading(false);
     }

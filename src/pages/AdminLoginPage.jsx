@@ -37,8 +37,8 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-luxury-black min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-luxury-charcoal p-8 rounded-3xl border border-luxury-gold/30 shadow-2xl space-y-6">
+    <div className="pt-12 pb-16 bg-luxury-black min-h-screen flex items-start justify-center px-4">
+      <div className="max-w-md w-full bg-luxury-charcoal p-8 rounded-3xl border border-luxury-gold/30 shadow-2xl space-y-6 mt-6">
         
         {/* Header */}
         <div className="text-center space-y-2">

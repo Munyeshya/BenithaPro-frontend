@@ -63,7 +63,7 @@ export default function Navbar() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1 font-bold uppercase tracking-wider">
-                <Sparkles size={12} /> BenithaMakeup Pro Studio • Kigali
+                <Sparkles size={12} /> BenithaMakeup Pro • Kigali
               </span>
             </div>
             <div className="flex items-center gap-4 text-[10px] sm:text-[11px]">

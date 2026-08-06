@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import API from '../services/api';
 import CalendarPicker from '../components/CalendarPicker';
+import { demoCategories, demoPaymentMethods, demoSchedule } from '../data/demoData';
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
@@ -93,6 +94,19 @@ export default function BookingPage() {
       }
     } catch (err) {
       console.error('Error fetching booking setup data:', err);
+      setCategories(demoCategories);
+      setPaymentMethods(demoPaymentMethods);
+
+      if (preselectedPackageId) {
+        for (const cat of demoCategories) {
+          const found = cat.packages.find(p => p.id === parseInt(preselectedPackageId));
+          if (found) {
+            setSelectedCategory(cat.id);
+            setSelectedPackage(found);
+            break;
+          }
+        }
+      }
     }
   };
 
@@ -120,8 +134,11 @@ export default function BookingPage() {
         setSlotError(res.data.reason);
       }
     } catch (err) {
-      setTimelineSegments([]);
-      setSlotError('Unable to check availability for this date.');
+      console.error('Using preview schedule:', err);
+      setTimelineSegments(demoSchedule.timeline_segments);
+      setOpeningTime(demoSchedule.opening_time);
+      setClosingTime(demoSchedule.closing_time);
+      setSlotError('');
     } finally {
       setCheckingSlots(false);
     }
