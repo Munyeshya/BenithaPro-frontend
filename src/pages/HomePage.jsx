@@ -159,7 +159,7 @@ export default function HomePage() {
           aria-hidden="true"
           viewBox="0 0 1440 110"
           preserveAspectRatio="none"
-          className="absolute z-20 -bottom-px left-0 w-full h-16 sm:h-20 lg:h-24 pointer-events-none"
+          className="absolute z-20 -bottom-2 sm:-bottom-3 left-0 w-full h-10 sm:h-12 lg:h-14 pointer-events-none"
         >
           <path
             fill="#FFF9FB"
