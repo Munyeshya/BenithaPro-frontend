@@ -1,3 +1,7 @@
+import bridalPortrait from '../assets/makeup-bridal.webp';
+import softGlamPortrait from '../assets/makeup-soft-glam.webp';
+import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
+
 export const demoCategories = [
   {
     id: 1,
@@ -13,7 +17,7 @@ export const demoCategories = [
         duration_minutes: 150,
         maximum_people: 1,
         is_featured: true,
-        images: [],
+        images: [{ image: bridalPortrait }],
       },
       {
         id: 102,
@@ -24,7 +28,7 @@ export const demoCategories = [
         duration_minutes: 210,
         maximum_people: 2,
         is_featured: true,
-        images: [],
+        images: [{ image: bridalPortrait }],
       },
       {
         id: 103,
@@ -35,7 +39,7 @@ export const demoCategories = [
         duration_minutes: 480,
         maximum_people: 2,
         is_featured: false,
-        images: [],
+        images: [{ image: bridalPortrait }],
       },
     ],
   },
@@ -53,7 +57,7 @@ export const demoCategories = [
         duration_minutes: 90,
         maximum_people: 1,
         is_featured: false,
-        images: [],
+        images: [{ image: softGlamPortrait }],
       },
       {
         id: 202,
@@ -64,7 +68,7 @@ export const demoCategories = [
         duration_minutes: 120,
         maximum_people: 1,
         is_featured: false,
-        images: [],
+        images: [{ image: eveningGlamPortrait }],
       },
       {
         id: 203,
@@ -75,7 +79,7 @@ export const demoCategories = [
         duration_minutes: 150,
         maximum_people: 1,
         is_featured: false,
-        images: [],
+        images: [{ image: eveningGlamPortrait }],
       },
     ],
   },

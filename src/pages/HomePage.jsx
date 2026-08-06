@@ -5,6 +5,10 @@ import {
   MessageCircle, Star, ChevronDown, ChevronUp, ShieldCheck 
 } from 'lucide-react';
 import MotionWrapper from '../components/MotionWrapper';
+import heroPortrait from '../assets/makeup-hero.webp';
+import softGlamPortrait from '../assets/makeup-soft-glam.webp';
+import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
+import bridalPortrait from '../assets/makeup-bridal.webp';
 
 const phrases = [
   "Bridal Glam",
@@ -58,12 +62,12 @@ export default function HomePage() {
   };
 
   const portfolioItems = [
-    { id: 1, title: 'Luxury Bridal Glam', category: 'bridal', img: 'https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=800&auto=format&fit=crop' },
-    { id: 2, title: 'Soft Glowing Skin', category: 'soft_glam', img: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop' },
-    { id: 3, title: 'Bold Evening Contour', category: 'full_glam', img: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=800&auto=format&fit=crop' },
-    { id: 4, title: 'High-Fashion Editorial', category: 'editorial', img: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop' },
-    { id: 5, title: 'Traditional Wedding Look', category: 'bridal', img: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=800&auto=format&fit=crop' },
-    { id: 6, title: 'Subtle Matte Finish', category: 'soft_glam', img: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=800&auto=format&fit=crop' },
+    { id: 1, title: 'Luxury Bridal Glam', category: 'bridal', img: bridalPortrait },
+    { id: 2, title: 'Soft Glowing Skin', category: 'soft_glam', img: softGlamPortrait },
+    { id: 3, title: 'Bold Evening Contour', category: 'full_glam', img: eveningGlamPortrait },
+    { id: 4, title: 'Modern Beauty Editorial', category: 'editorial', img: heroPortrait },
+    { id: 5, title: 'Timeless Wedding Look', category: 'bridal', img: bridalPortrait },
+    { id: 6, title: 'Luminous Bronze Finish', category: 'soft_glam', img: softGlamPortrait },
   ];
 
   const filteredPortfolio = portfolioTab === 'all' 
@@ -146,7 +150,7 @@ export default function HomePage() {
               <div className="absolute -inset-1 bg-gradient-to-r from-luxury-pink to-luxury-pink-dark blur opacity-30 rounded-tl-[60px] rounded-br-[60px]"></div>
               <div className="relative w-full h-[350px] sm:h-[420px] lg:h-[460px] shadow-2xl border border-white/10 overflow-hidden rounded-tl-[60px] rounded-br-[60px]">
                 <img 
-                  src="https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?q=80&w=1000&auto=format&fit=crop" 
+                  src={heroPortrait}
                   alt="BenithaMakeup Pro Editorial Portrait" 
                   className="w-full h-full object-cover"
                 />
@@ -230,27 +234,27 @@ export default function HomePage() {
             The Transformation <span className="text-luxury-pink italic font-normal">Experience</span>
           </h2>
           <p className="text-gray-600 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
-            Drag the slider below to view how we enhance skin texture while preserving natural complexion.
+            Drag the slider to compare two of our signature makeup directions.
           </p>
 
           <div className="relative max-w-2xl mx-auto mt-10 overflow-hidden shadow-2xl border border-luxury-nude select-none h-[380px] sm:h-[460px]">
             <img 
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1000&auto=format&fit=crop" 
-              alt="After Glam" 
+              src={eveningGlamPortrait}
+              alt="Evening glam makeup look"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <span className="absolute top-4 right-4 bg-luxury-black/80 text-luxury-pink text-[10px] font-bold uppercase px-3 py-1 z-10 font-nav">After Glam</span>
+            <span className="absolute top-4 right-4 bg-luxury-black/80 text-luxury-pink text-[10px] font-bold uppercase px-3 py-1 z-10 font-nav">Evening Glam</span>
 
             <div 
               className="absolute inset-0 overflow-hidden" 
               style={{ width: `${sliderPosition}%` }}
             >
               <img 
-                src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=1000&auto=format&fit=crop" 
-                alt="Before Natural" 
+                src={softGlamPortrait}
+                alt="Soft glam makeup look"
                 className="absolute inset-0 w-[672px] h-full object-cover max-w-none"
               />
-              <span className="absolute top-4 left-4 bg-luxury-cream/90 text-luxury-black text-[10px] font-bold uppercase px-3 py-1 font-nav">Before</span>
+              <span className="absolute top-4 left-4 bg-luxury-cream/90 text-luxury-black text-[10px] font-bold uppercase px-3 py-1 font-nav">Soft Glam</span>
             </div>
 
             <div 

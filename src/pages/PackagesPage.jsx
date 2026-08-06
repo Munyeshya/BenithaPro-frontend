@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import API from '../services/api';
 import MotionWrapper from '../components/MotionWrapper';
 import { demoCategories } from '../data/demoData';
+import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 
 export default function PackagesPage() {
   const [categories, setCategories] = useState([]);
@@ -125,7 +126,7 @@ export default function PackagesPage() {
                   {/* Package Image */}
                   <div className="h-52 w-full overflow-hidden bg-luxury-cream relative">
                     <img
-                      src={pkg.images && pkg.images.length > 0 ? pkg.images[0].image : 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop'}
+                      src={pkg.images && pkg.images.length > 0 ? pkg.images[0].image : softGlamPortrait}
                       alt={pkg.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
