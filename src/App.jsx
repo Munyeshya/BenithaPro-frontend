@@ -1,11 +1,8 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { LanguageProvider } from './context/LanguageContext';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import FloatingMakeupBackground from './components/FloatingMakeupBackground';
+import PublicShell from './components/PublicShell';
 import AdminLayout from './components/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -13,6 +10,7 @@ import HomePage from './pages/HomePage';
 import PackagesPage from './pages/PackagesPage';
 import GalleryPage from './pages/GalleryPage';
 import TrackAppointmentPage from './pages/TrackAppointmentPage';
+import ExperiencePage from './pages/ExperiencePage';
 import BookingPage from './pages/BookingPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -30,23 +28,15 @@ export default function App() {
         <Router>
           <Routes>
             {/* ================= PUBLIC CLIENT ROUTES ================= */}
-            <Route path="/*" element={
-              <div className="min-h-screen flex flex-col bg-luxury-cream text-luxury-black relative selection:bg-luxury-pink selection:text-white">
-                <FloatingMakeupBackground />
-                <Navbar />
-                <main className="flex-grow">
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/packages" element={<PackagesPage />} />
-                    <Route path="/gallery" element={<GalleryPage />} />
-                    <Route path="/track" element={<TrackAppointmentPage />} />
-                    <Route path="/book" element={<BookingPage />} />
-                    <Route path="/admin/login" element={<AdminLoginPage />} />
-                  </Routes>
-                </main>
-                <Footer />
-              </div>
-            } />
+            <Route element={<PublicShell />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/packages" element={<PackagesPage />} />
+              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/track" element={<TrackAppointmentPage />} />
+              <Route path="/experience" element={<ExperiencePage />} />
+              <Route path="/book" element={<BookingPage />} />
+            </Route>
+            <Route path="/admin/login" element={<AdminLoginPage />} />
 
             {/* ================= PROTECTED ADMIN PORTAL ROUTES ================= */}
             <Route element={<ProtectedRoute />}>

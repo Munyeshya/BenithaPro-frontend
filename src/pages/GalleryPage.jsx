@@ -17,7 +17,7 @@ const galleryLooks = [
 export default function GalleryPage() {
   const { t } = useLanguage();
   return (
-    <MotionWrapper className="pb-24 bg-white min-h-screen">
+    <MotionWrapper className="figma-public-secondary pb-24 bg-white min-h-screen">
       <div className="bg-[#f4efe5] py-20 lg:py-28 px-4 text-center">
         <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">{t('Portfolio & Artistry')}</span>
         <h1 className="font-['Jost'] text-5xl sm:text-7xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">

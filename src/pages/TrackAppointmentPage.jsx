@@ -29,7 +29,7 @@ export default function TrackAppointmentPage() {
   };
 
   return (
-    <MotionWrapper className="bg-[#f4efe5] min-h-screen px-4 py-20 lg:py-28">
+    <MotionWrapper className="figma-public-secondary bg-[#f7f6f3] min-h-screen px-4 py-12 lg:py-28">
       <div className="max-w-5xl mx-auto grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
         <div className="lg:col-span-2 lg:sticky lg:top-32">
         <div className="text-left space-y-2">

@@ -250,13 +250,13 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="editorial-booking py-20 lg:py-28 bg-[#f4efe5] min-h-screen">
+    <div className="editorial-booking figma-booking min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Page Header */}
         <div className="text-center mb-10 max-w-2xl mx-auto">
           <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">{t('Seamless Online Reservation')}</span>
-          <h1 className="font-['Jost'] text-5xl sm:text-6xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">
+          <h1 className="font-['Cormorant_Garamond'] text-3xl sm:text-4xl font-semibold text-luxury-black mt-1 uppercase">
             {t('Book Your')} <span className="text-luxury-rosegold italic font-normal">{t('Glam Experience')}</span>
           </h1>
         </div>
