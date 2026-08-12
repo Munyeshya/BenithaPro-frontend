@@ -1,14 +1,14 @@
-import { Bell, Menu, ArrowRight, Crown, Sparkles, Users } from 'lucide-react';
+import { Bell, Menu, ArrowRight, UserRound, UsersRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import hero from '../assets/makeup-hero.webp';
+import hero from '../assets/home-hero-v3.png';
 import bridal from '../assets/makeup-bridal.webp';
 import normal from '../assets/makeup-soft-glam.webp';
 import group from '../assets/makeup-evening-glam.webp';
 
 const services = [
-  { name: 'Bridal makeup', icon: Crown, image: bridal, copy: 'For your most unforgettable day.' },
-  { name: 'Normal makeup', icon: Sparkles, image: normal, copy: 'For parties, portraits and special occasions.' },
-  { name: 'Group makeup', icon: Users, image: group, copy: 'For bridesmaids, friends and events.' },
+  { name: 'Bridal makeup', icon: UserRound, image: bridal, copy: 'For your most unforgettable day.' },
+  { name: 'Normal makeup', icon: UserRound, image: normal, copy: 'For parties, portraits and special occasions.' },
+  { name: 'Group makeup', icon: UsersRound, image: group, copy: 'For bridesmaids, friends and events.' },
 ];
 
 export default function HomePage() {
@@ -18,11 +18,13 @@ export default function HomePage() {
       <div className="figma-hero-shade" />
       <button className="figma-menu" aria-label="Open menu"><Menu size={22}/></button>
       <Bell className="figma-bell" size={20}/>
-      <div className="figma-wordmark"><em>B</em><span>Benitha</span><small>MAKEUP PRO</small></div>
-      <div className="figma-hero-copy">
-        <h1>Beyond your<br/>expectations!</h1>
-        <p>Luxury beauty for your<br/>most beautiful moments.</p>
-        <Link to="/book">Book appointment <ArrowRight size={15}/></Link>
+      <div className="figma-hero-content">
+        <img className="figma-logo" src="/benitha-logo-refined-transparent.png" alt="Benitha Makeup Pro" />
+        <div className="figma-hero-copy">
+          <h1>Beyond your<br/><span>expectations!</span></h1>
+          <p>Luxury beauty for your<br/>most beautiful moments.</p>
+        </div>
+        <Link className="figma-hero-cta" to="/book">Book appointment <ArrowRight size={15}/></Link>
       </div>
     </section>
 

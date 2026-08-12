@@ -24,28 +24,27 @@
 
 .public-v3 { font-family:'Inter',sans-serif; padding-bottom:72px; }
 .figma-desktop-nav,.figma-footer { display:none; }
-.figma-home { background:var(--bm-black); min-height:772px; }
-.figma-hero { position:relative; height:525px; overflow:hidden; color:white; }
-.figma-hero-image { position:absolute; inset:0 0 0 auto; width:54%; height:100%; object-fit:cover; object-position:65% center; }
-.figma-hero-shade { position:absolute; inset:0; background:linear-gradient(90deg,#070707 0%,#070707 50%,rgba(7,7,7,.42) 76%,rgba(7,7,7,.08)); }
-.figma-menu,.figma-bell { position:absolute; top:24px; z-index:2; color:var(--bm-gold); }
-.figma-menu { left:20px; background:none; border:0; }.figma-bell { right:24px; }
-.figma-wordmark { position:absolute; top:86px; left:25px; width:170px; color:var(--bm-gold); font-family:'Cormorant Garamond',serif; line-height:.8; }
-.figma-wordmark em { display:block; margin-left:8px; font-size:66px; font-weight:400; }.figma-wordmark span { display:block; font-size:38px; font-style:italic; }
-.figma-wordmark small { display:block; margin:7px 0 0 12px; color:#d7cfc3; font:500 10px Inter,sans-serif; letter-spacing:.12em; }
-.figma-hero-copy { position:absolute; z-index:2; left:20px; right:20px; top:240px; }
-.figma-hero-copy h1 { color:white; font:600 34px/34px 'Cormorant Garamond',serif; text-transform:uppercase; }
-.figma-hero-copy p { margin-top:12px; color:#e2ded8; font:400 13px/20px Inter,sans-serif; }
-.figma-hero-copy a { height:48px; margin-top:28px; border:1px solid var(--bm-gold); border-radius:7px!important; color:var(--bm-gold); display:flex; align-items:center; justify-content:center; gap:16px; font-size:11px; font-weight:600; text-transform:uppercase; }
-.figma-services-sheet { height:247px; padding:20px 18px; background:white; border-radius:24px 24px 0 0!important; }
-.figma-section-title { display:flex; justify-content:space-between; align-items:center; }.figma-section-title h2 { font:600 16px 'Cormorant Garamond',serif; text-transform:uppercase; }.figma-section-title a { font-size:10px;color:#6c6c6c; }
-.figma-service-tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:20px; }
-.figma-service-tiles a { height:142px; position:relative; display:flex; flex-direction:column; align-items:center; border:1px solid var(--bm-line); border-radius:9px!important; color:#171717; }
-.figma-service-tiles a>span { width:44px;height:44px;margin-top:16px;border:1px solid var(--bm-gold);border-radius:50%!important;display:grid;place-items:center;color:var(--bm-gold); }
-.figma-service-tiles strong { width:80px; margin-top:17px; text-align:center; font-size:10px; line-height:14px; text-transform:uppercase; }.figma-service-tiles i { display:none; }
+.figma-home { background:var(--bm-black); min-height:100svh; overflow:hidden; }
+.figma-hero { position:relative; height:calc(100svh - 84px); min-height:682px; overflow:hidden; color:white; }
+.figma-hero-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; }
+.figma-hero-shade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.03) 42%,rgba(0,0,0,.3) 66%,#050505 100%); }
+.figma-menu,.figma-bell { position:absolute; top:34px; z-index:2; color:#d4a454; }
+.figma-menu { left:23px; background:none; border:0; }.figma-bell { right:23px; }
+.figma-hero-content { position:absolute; z-index:2; inset:88px 28px 38px; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; }
+.figma-logo { width:205px; height:205px; margin-left:-6px; object-fit:contain; object-position:left center; }
+.figma-hero-copy { width:100%; }
+.figma-hero-copy h1 { color:#f7eee2; font:600 36px/1.15 'Cormorant Garamond',serif; text-transform:uppercase; }.figma-hero-copy h1 span{color:var(--bm-gold)}
+.figma-hero-copy p { margin-top:28px; color:#f3f3f3; font:400 17px/1.65 Inter,sans-serif; }
+.figma-hero-cta { width:100%; height:54px; border:1px solid #8e6428; border-radius:12px!important; color:#8e6428; display:flex; align-items:center; justify-content:center; gap:40px; font-size:13px; font-weight:700; text-transform:uppercase; }
+.figma-services-sheet { height:332px; padding:30px 24px; background:white; border-radius:28px 28px 0 0!important; }
+.figma-section-title { display:flex; justify-content:space-between; align-items:center; position:relative; }.figma-section-title:after{content:'';position:absolute;left:0;top:38px;width:44px;height:1px;background:var(--bm-gold)}.figma-section-title h2 { font:600 20px 'Cormorant Garamond',serif; text-transform:uppercase; }.figma-section-title a { font-size:14px;color:#171717; }
+.figma-service-tiles { display:grid; grid-template-columns:repeat(3,1fr); gap:17px; margin-top:43px; }
+.figma-service-tiles a { height:190px; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border:0; border-radius:10px!important; color:#171717; box-shadow:0 5px 18px rgba(0,0,0,.1); }
+.figma-service-tiles a>span { width:70px;height:70px;display:grid;place-items:center;color:#c9952e; }.figma-service-tiles a>span svg{width:55px;height:55px;stroke-width:1.2}
+.figma-service-tiles strong { width:90px; margin-top:14px; text-align:center; font-size:14px; line-height:20px; text-transform:uppercase; }.figma-service-tiles i { display:none; }
 .desktop-services { display:none; }
-.figma-bottom-nav { height:72px; position:fixed; z-index:50; bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:#070707;border-top:1px solid #272727; }
-.figma-bottom-nav a { display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; color:#bebebe; font-size:9px; }.figma-bottom-nav a.active { color:var(--bm-gold); }
+.figma-bottom-nav { height:84px; position:fixed; z-index:50; bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:#050505;border-top:1px solid #272727; }
+.figma-bottom-nav a { display:flex; flex-direction:column; gap:5px; align-items:center; justify-content:center; color:#aaa; font-size:11px; }.figma-bottom-nav a svg{width:25px;height:25px}.figma-bottom-nav a.active { color:var(--bm-gold); }
 .figma-page { min-height:calc(100svh - 72px); padding:26px 20px 96px; background:#fafafa; }.figma-page header { text-align:center; }.figma-page header h1 { font:600 30px 'Cormorant Garamond',serif; text-transform:uppercase; }.figma-page header p { margin-top:7px; font-size:12px; line-height:18px; }
 .figma-back { color:#171717; background:none;border:0;margin-bottom:0; }
 .figma-category-list { margin-top:20px; display:grid; gap:20px; }.figma-category-list article { height:150px; display:grid; grid-template-columns:1fr 120px; overflow:hidden;background:white;border:1px solid var(--bm-line);border-radius:9px!important;box-shadow:0 3px 12px rgba(0,0,0,.04); }
@@ -57,7 +56,7 @@
 @media (min-width:768px) {
   .public-v3 { padding-bottom:0; }.figma-bottom-nav { display:none; }.figma-desktop-nav { height:92px;padding:0 max(32px,calc((100vw - 1280px)/2));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;background:white;border-bottom:1px solid var(--bm-line);position:sticky;top:0;z-index:50; }
   .nav-brand img { width:74px;height:74px;object-fit:contain; }.figma-desktop-nav nav { display:flex;gap:34px; }.figma-desktop-nav nav a { font:500 14px Inter,sans-serif; }.nav-book { justify-self:end;background:#070707;color:#c9952e;padding:15px 24px;text-transform:uppercase;font-size:11px; }
-  .figma-home { min-height:0; }.figma-hero { height:calc(100svh - 92px);min-height:650px; }.figma-hero-image { width:57%; }.figma-hero-shade { background:linear-gradient(90deg,#070707 0%,#070707 38%,rgba(7,7,7,.62) 58%,rgba(7,7,7,.08)); }.figma-menu,.figma-bell { display:none; }.figma-wordmark { top:12%;left:max(6vw,calc((100vw - 1280px)/2));transform:scale(1.12);transform-origin:left top; }.figma-hero-copy { left:max(6vw,calc((100vw - 1280px)/2));top:43%;right:auto;width:520px; }.figma-hero-copy h1 { font-size:66px;line-height:.93; }.figma-hero-copy p { font-size:16px;line-height:25px;margin-top:24px; }.figma-hero-copy a { width:280px;margin-top:34px; }
+  .figma-hero { height:calc(100svh - 92px);min-height:680px; }.figma-hero-image{object-position:center 20%}.figma-hero-shade { background:linear-gradient(90deg,rgba(7,7,7,.98) 0%,rgba(7,7,7,.77) 36%,rgba(7,7,7,.08) 72%); }.figma-menu,.figma-bell { display:none; }.figma-hero-content{inset:7% auto 8% max(6vw,calc((100vw - 1280px)/2));width:520px}.figma-logo { width:260px;height:260px; }.figma-hero-copy h1 { font-size:66px;line-height:.93; }.figma-hero-copy p { font-size:16px;line-height:25px;margin-top:24px; }.figma-hero-cta { width:280px; }
   .figma-services-sheet { display:none; }.desktop-services { display:block;background:#f7f6f3;padding:110px max(5vw,calc((100vw - 1280px)/2)); }.desktop-services header small { color:#a87519;text-transform:uppercase;letter-spacing:.18em; }.desktop-services header h2 { font:600 54px 'Cormorant Garamond',serif;margin-top:8px; }.desktop-services>div { display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:42px; }.desktop-services article { background:white; }.desktop-services article img { width:100%;height:390px;object-fit:cover; }.desktop-services article div { padding:26px; }.desktop-services article small{color:#a87519;font-size:9px;letter-spacing:.16em}.desktop-services article h3{font:600 28px 'Cormorant Garamond',serif;text-transform:uppercase;margin-top:8px}.desktop-services article p{color:#666;font-size:13px;margin:8px 0 22px}.desktop-services article a{display:flex;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;font-weight:600}
   .figma-footer { display:grid;background:#070707;color:#bbb;padding:70px max(5vw,calc((100vw - 1280px)/2));grid-template-columns:1fr auto;gap:20px;align-items:center; }.figma-footer img{width:90px;height:90px;object-fit:contain}.figma-footer p{grid-column:1}.figma-footer nav{grid-column:2;grid-row:1/3;display:flex;gap:30px;color:white}.figma-footer small{grid-column:1;color:#777}
   .figma-page { padding:70px max(5vw,calc((100vw - 1200px)/2)); }.figma-page header h1{font-size:54px}.figma-page header p{font-size:14px}.figma-category-list{grid-template-columns:repeat(3,1fr);margin-top:55px}.figma-category-list article{height:420px;display:flex;flex-direction:column-reverse}.figma-category-list article img{width:100%;height:250px}.figma-category-list article>div{height:170px}.figma-category-list p{height:40px;font-size:12px}.figma-category-list button{font-size:10px}
