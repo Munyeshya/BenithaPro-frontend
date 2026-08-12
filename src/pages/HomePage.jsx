@@ -60,19 +60,19 @@ export default function HomePage() {
       {/* VERSION TWO: EDITORIAL THREE-COLUMN HERO */}
       <section className="relative min-h-[calc(100svh-6.75rem)] overflow-hidden bg-[#f4efe5] flex items-center border-b border-luxury-gold/30">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-['Jost'] text-[18vw] font-bold tracking-[-0.08em] text-luxury-gold/[0.08] select-none pointer-events-none">BENITHA</div>
-        <div className="relative z-10 max-w-[1380px] mx-auto px-5 sm:px-8 lg:px-12 pt-10 w-full grid lg:grid-cols-12 gap-4 items-end">
-          <div className="lg:col-span-5 text-center lg:text-left pb-12 lg:pb-24 order-2 lg:order-1 relative z-20">
+        <div className="relative z-10 max-w-[1380px] mx-auto px-5 sm:px-8 lg:px-12 pt-6 lg:pt-8 w-full grid lg:grid-cols-12 gap-4 items-stretch">
+          <div className="lg:col-span-5 text-center lg:text-left py-10 lg:py-16 order-2 lg:order-1 relative z-20 flex flex-col justify-center lg:self-start lg:mt-[7vh]">
             <span className="text-luxury-rosegold text-xs font-bold uppercase tracking-[0.28em]">{t('Glow beyond beauty')}</span>
-            <h1 className="font-['Jost'] text-[clamp(3rem,6vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-luxury-black mt-5">{t('Beyond your')} <span className="block font-['Montserrat'] italic font-medium text-luxury-rosegold">{t('expectations.')}</span></h1>
-            <p className="max-w-md mx-auto lg:mx-0 text-gray-600 leading-relaxed mt-6">{t('Refined makeup artistry for every shade of beauty, created for weddings, events, portraits, and unforgettable moments.')}</p>
-            <Link to="/book" className="inline-flex items-center gap-4 bg-luxury-black text-white mt-8 px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-luxury-gold hover:text-luxury-black transition-colors">{t('Book your session')} <ArrowRight size={16} /></Link>
+            <h1 className="font-['Jost'] text-[clamp(3rem,6vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-luxury-black mt-7">{t('Beyond your')} <span className="block font-['Montserrat'] italic font-medium text-luxury-rosegold">{t('expectations.')}</span></h1>
+            <p className="max-w-md mx-auto lg:mx-0 text-gray-600 leading-[1.85] mt-8">{t('Refined makeup artistry for every shade of beauty, created for weddings, events, portraits, and unforgettable moments.')}</p>
+            <Link to="/book" className="inline-flex self-center lg:self-start items-center gap-4 bg-luxury-black text-white mt-10 px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-luxury-gold hover:text-luxury-black transition-colors">{t('Book your session')} <ArrowRight size={16} /></Link>
           </div>
 
           <div className="lg:col-span-5 order-1 lg:order-2 flex justify-center self-stretch min-h-[480px] lg:min-h-[650px] relative">
             <img src={heroCutout} alt="Benitha Makeup Pro beauty model" className="absolute bottom-0 h-full max-h-[720px] w-auto max-w-none object-contain object-bottom drop-shadow-[0_24px_28px_rgba(44,28,8,0.16)]" />
           </div>
 
-          <div className="lg:col-span-2 order-3 max-w-xs mx-auto lg:mx-0 pb-12 lg:pb-24 relative z-20">
+          <div className="lg:col-span-2 order-3 max-w-xs mx-auto lg:mx-0 py-10 lg:py-16 relative z-20 lg:self-start lg:mt-[4vh]">
             <div className="bg-white p-3 shadow-xl rotate-[2deg]">
               <img src={studioPortrait} alt="Benitha Makeup Pro Kigali studio" className="w-full h-52 lg:h-64 object-cover" />
               <div className="px-3 py-4">
