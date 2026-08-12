@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -39,15 +39,17 @@ export default function PackagesPage() {
     : categories.find(c => c.id === parseInt(selectedCategory))?.packages || [];
 
   return (
-    <MotionWrapper className="pt-28 pb-24 bg-luxury-cream min-h-screen">
+    <MotionWrapper className="pb-24 bg-[#f4efe5] min-h-screen">
       
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
+      <div className="relative overflow-hidden bg-luxury-black text-white py-20 lg:py-28 px-4 text-center mb-16">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 font-['Jost'] text-[17vw] font-bold tracking-[-0.07em] text-white/[0.035] pointer-events-none">SERVICES</div>
+        <div className="relative max-w-7xl mx-auto">
         <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Exquisite Beauty Services</span>
-        <h1 className="font-serif text-4xl sm:text-5xl font-bold text-luxury-black mt-2">
+        <h1 className="font-['Jost'] text-5xl sm:text-7xl font-semibold tracking-[-0.05em] text-white mt-3">
           Packages & <span className="text-luxury-pink italic font-normal">Pricing</span>
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mt-3 text-sm leading-relaxed">
+        <p className="text-gray-400 max-w-2xl mx-auto mt-5 text-sm leading-relaxed">
           Bespoke glam services designed for brides, special events, and photoshoots in Kigali. Select your service to start booking.
         </p>
 
@@ -79,6 +81,7 @@ export default function PackagesPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
 
       {loading && (
@@ -107,14 +110,14 @@ export default function PackagesPage() {
               <p className="text-gray-500 text-sm">No makeup packages found in this category.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-luxury-gold/30 border border-luxury-gold/30">
               {displayedPackages.map((pkg, index) => (
                 <motion.div
                   key={pkg.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="bg-white overflow-hidden border border-luxury-nude shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between relative group"
+                  className="bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between relative group"
                 >
                   {/* Featured Tag */}
                   {pkg.is_featured && (
@@ -124,7 +127,7 @@ export default function PackagesPage() {
                   )}
 
                   {/* Package Image */}
-                  <div className="h-52 w-full overflow-hidden bg-luxury-cream relative">
+                  <div className="h-72 w-full overflow-hidden bg-luxury-cream relative">
                     <img
                       src={pkg.images && pkg.images.length > 0 ? pkg.images[0].image : softGlamPortrait}
                       alt={pkg.name}
@@ -138,7 +141,7 @@ export default function PackagesPage() {
                   {/* Body Content */}
                   <div className="p-6 flex-grow flex flex-col justify-between">
                     <div>
-                      <h3 className="font-serif text-xl font-bold text-luxury-black group-hover:text-luxury-pink-dark transition-colors">
+                      <h3 className="font-['Jost'] text-2xl font-medium text-luxury-black group-hover:text-luxury-pink-dark transition-colors">
                         {pkg.name}
                       </h3>
 

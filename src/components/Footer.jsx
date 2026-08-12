@@ -1,10 +1,13 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, MapPin, Phone, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-luxury-black text-gray-300 pt-16 pb-8 border-t border-luxury-charcoal">
+    <footer className="bg-luxury-black text-gray-300 pt-20 pb-8 border-t border-luxury-gold/20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 border-b border-white/10 pb-12">
+        <div><span className="text-[10px] uppercase tracking-[0.24em] text-luxury-gold">Your moment, elevated</span><h2 className="font-['Jost'] text-4xl sm:text-6xl text-white font-medium tracking-[-0.04em] mt-3">Ready for your glow?</h2></div>
+        <Link to="/book" className="inline-flex items-center justify-center border border-luxury-gold bg-luxury-gold text-luxury-black px-8 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-transparent hover:text-luxury-gold transition-colors">Book appointment</Link>
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
         
         {/* Brand */}

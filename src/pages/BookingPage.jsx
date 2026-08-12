@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
-  Calendar, Clock, User, CreditCard, Upload, 
+  Calendar, User, CreditCard, Upload,
   CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, 
   Loader2, Sparkles, MessageCircle, AlertTriangle
 } from 'lucide-react';
@@ -248,13 +248,13 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="pt-28 pb-24 bg-luxury-cream min-h-screen">
+    <div className="editorial-booking py-20 lg:py-28 bg-[#f4efe5] min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Page Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 max-w-2xl mx-auto">
           <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">Seamless Online Reservation</span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-luxury-black mt-1">
+          <h1 className="font-['Jost'] text-5xl sm:text-6xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">
             Book Your <span className="text-luxury-rosegold italic font-normal">Glam Experience</span>
           </h1>
         </div>

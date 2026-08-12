@@ -1,4 +1,3 @@
-import React from 'react';
 import MotionWrapper from '../components/MotionWrapper';
 import heroPortrait from '../assets/makeup-hero.webp';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
@@ -16,26 +15,31 @@ const galleryLooks = [
 
 export default function GalleryPage() {
   return (
-    <MotionWrapper className="pt-28 pb-24 bg-luxury-cream min-h-screen px-4">
-      <div className="max-w-7xl mx-auto text-center space-y-4">
+    <MotionWrapper className="pb-24 bg-white min-h-screen">
+      <div className="bg-[#f4efe5] py-20 lg:py-28 px-4 text-center">
         <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Portfolio & Artistry</span>
-        <h1 className="font-serif text-4xl sm:text-5xl font-bold text-luxury-black">
-          Makeup <span className="text-luxury-pink italic font-normal">Gallery</span>
+        <h1 className="font-['Jost'] text-5xl sm:text-7xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">
+          Makeup <span className="font-['Montserrat'] text-luxury-pink italic font-medium">Gallery</span>
         </h1>
-        <p className="text-gray-600 text-sm max-w-xl mx-auto">
-          Explore our stunning bridal, editorial, and special event transformations in Kigali.
-        </p>
+        <p className="text-gray-600 text-sm max-w-xl mx-auto mt-5">Explore bridal, editorial, and special-event artistry created in Kigali.</p>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        <div className="flex items-end justify-between border-b border-luxury-gold/40 pb-5 mb-8">
+          <h2 className="font-['Jost'] text-3xl font-medium">Selected looks</h2>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-gray-500">Benitha Makeup Pro</span>
+        </div>
 
         {/* Gallery Grid Placeholder */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-5">
           {galleryLooks.map((look, index) => (
-            <div key={index} className="h-80 bg-white border border-luxury-nude overflow-hidden relative group">
+            <figure key={index} className={`group overflow-hidden bg-luxury-cream ${index % 3 === 1 ? 'lg:col-span-5' : 'lg:col-span-3'} ${index % 3 === 2 ? 'lg:col-span-4' : ''}`}>
               <img
                 src={look.src}
                 alt={look.alt}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className={`w-full object-cover group-hover:scale-105 transition-transform duration-700 ${index % 3 === 1 ? 'h-[500px]' : 'h-[390px]'}`}
               />
-            </div>
+              <figcaption className="flex justify-between p-4 text-[10px] uppercase tracking-[0.18em]"><span>{look.alt.replace(' on a Black woman', '').replace(' on a Black bride', '')}</span><span className="text-luxury-gold">0{index + 1}</span></figcaption>
+            </figure>
           ))}
         </div>
       </div>

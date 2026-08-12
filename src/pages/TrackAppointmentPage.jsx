@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Calendar, Clock, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Search, AlertCircle, Loader2 } from 'lucide-react';
 import MotionWrapper from '../components/MotionWrapper';
 import API from '../services/api';
 
@@ -18,7 +18,7 @@ export default function TrackAppointmentPage() {
       setError('');
       const res = await API.get(`/appointments/track/${token.trim()}/`);
       setAppointment(res.data);
-    } catch (err) {
+    } catch {
       setAppointment(null);
       setError('Appointment not found. Please check your secure access code or ID.');
     } finally {
@@ -27,17 +27,19 @@ export default function TrackAppointmentPage() {
   };
 
   return (
-    <MotionWrapper className="pt-28 pb-24 bg-luxury-cream min-h-screen px-4">
-      <div className="max-w-xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
+    <MotionWrapper className="bg-[#f4efe5] min-h-screen px-4 py-20 lg:py-28">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
+        <div className="lg:col-span-2 lg:sticky lg:top-32">
+        <div className="text-left space-y-2">
           <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Reservation Status</span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-luxury-black">
+          <h1 className="font-['Jost'] text-5xl sm:text-6xl leading-[0.95] tracking-[-0.05em] font-semibold text-luxury-black mt-4">
             Track Your <span className="text-luxury-pink italic font-normal">Appointment</span>
           </h1>
-          <p className="text-gray-600 text-xs">Enter your secure booking token or code to view real-time status.</p>
+          <p className="text-gray-600 text-sm mt-5 leading-relaxed">Enter your secure booking code to view the live status of your Benitha appointment.</p>
         </div>
-
-        <form onSubmit={handleTrack} className="bg-white p-6 border border-luxury-nude shadow-sm space-y-4">
+        </div>
+        <div className="lg:col-span-3 space-y-6">
+        <form onSubmit={handleTrack} className="bg-white p-7 lg:p-10 border-t-4 border-luxury-gold shadow-[0_24px_60px_rgba(25,18,4,0.08)] space-y-5">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">Secure Tracking Token / ID</label>
             <div className="flex gap-2">
@@ -86,6 +88,7 @@ export default function TrackAppointmentPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </MotionWrapper>
   );
