@@ -72,9 +72,9 @@ export default function HomePage() {
               <Sparkles size={14} /> Benitha Makeup Pro · Kigali
             </div>
 
-            <h1 className="font-['Montserrat'] text-[clamp(2.75rem,7.5vh,5.6rem)] font-bold tracking-[-0.045em] leading-[0.94] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
+            <h1 className="font-['Jost'] text-[clamp(2.75rem,7.5vh,5.6rem)] font-bold tracking-[-0.045em] leading-[0.94] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
               Beyond your
-              <span className="block text-luxury-pink italic font-medium mt-2">expectations.</span>
+              <span className="block font-['Montserrat'] text-luxury-pink italic font-medium mt-2">expectations.</span>
             </h1>
 
             <div className="mt-[clamp(1rem,2.5vh,1.5rem)] flex flex-wrap items-center gap-x-3 gap-y-2 text-white/75 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-nav">
