@@ -9,7 +9,7 @@ import heroPortrait from '../assets/makeup-hero.webp';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
 import bridalPortrait from '../assets/makeup-bridal.webp';
-import studioPortrait from '../assets/benitha-studio.webp';
+import studioPortrait from '../assets/benitha-studio-refined.webp';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -138,7 +138,8 @@ export default function HomePage() {
       </section>
 
       {/* Authentic studio identity */}
-      <section className="bg-luxury-cream py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-luxury-black py-16 lg:py-24 overflow-hidden border-b-4 border-luxury-gold">
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_75%_20%,#D4AF37_0,transparent_42%)]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="relative max-w-lg mx-auto lg:mx-0 w-full">
             <div className="absolute -inset-4 border border-luxury-gold/35 translate-x-6 translate-y-6"></div>
@@ -148,13 +149,13 @@ export default function HomePage() {
 
           <div className="max-w-xl">
             <span className="text-luxury-gold uppercase text-xs tracking-[0.24em] font-bold font-nav">The real Benitha experience</span>
-            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-luxury-black leading-tight mt-4">A beauty space built to make you <span className="text-luxury-rosegold italic font-normal">feel seen.</span></h2>
-            <p className="text-gray-600 leading-relaxed mt-6">From the signature black-and-gold studio to every finishing detail, Benitha Makeup Pro is designed around warm hospitality, refined artistry, and makeup that photographs beautifully without hiding your natural features.</p>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white leading-tight mt-4">A beauty space built to make you <span className="text-luxury-gold italic font-normal">feel seen.</span></h2>
+            <p className="text-gray-300 leading-relaxed mt-6">From the signature black-and-gold studio to every finishing detail, Benitha Makeup Pro is designed around warm hospitality, refined artistry, and makeup that photographs beautifully without hiding your natural features.</p>
             <div className="grid grid-cols-2 gap-4 mt-8 border-y border-luxury-gold/25 py-6">
-              <div><strong className="block font-serif text-2xl text-luxury-black">Kigali</strong><span className="text-[10px] uppercase tracking-widest text-gray-500">Private studio</span></div>
-              <div><strong className="block font-serif text-2xl text-luxury-black">On-location</strong><span className="text-[10px] uppercase tracking-widest text-gray-500">Bridal & events</span></div>
+              <div><strong className="block font-serif text-2xl text-white">Kigali</strong><span className="text-[10px] uppercase tracking-widest text-gray-400">Private studio</span></div>
+              <div><strong className="block font-serif text-2xl text-white">On-location</strong><span className="text-[10px] uppercase tracking-widest text-gray-400">Bridal & events</span></div>
             </div>
-            <a href="https://www.instagram.com/benitha_makeup_pro/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-8 bg-luxury-black text-luxury-gold px-7 py-4 text-xs uppercase tracking-[0.18em] font-bold font-nav hover:bg-luxury-gold hover:text-luxury-black transition-colors">Visit our Instagram <ArrowRight size={15} /></a>
+            <a href="https://www.instagram.com/benitha_makeup_pro/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-8 bg-luxury-gold text-luxury-black border border-luxury-gold px-7 py-4 text-xs uppercase tracking-[0.18em] font-bold font-nav hover:bg-transparent hover:text-luxury-gold transition-colors">Visit our Instagram <ArrowRight size={15} /></a>
           </div>
         </div>
       </section>
