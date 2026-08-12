@@ -54,6 +54,14 @@
   animation: whatsapp-ring 2.2s ease-out infinite;
 }
 
+.v2-hero-arch {
+  border-radius: 48% 48% 0 0 !important;
+}
+
+.whatsapp-float [class*="rounded-full"] {
+  border-radius: 9999px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .whatsapp-float,
   .whatsapp-ring {

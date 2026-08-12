@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Sparkles, Calendar, ArrowRight, CheckCircle, 
-  MessageCircle, Star, ChevronDown, ChevronUp, ShieldCheck 
-} from 'lucide-react';
+import { ArrowRight, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import MotionWrapper from '../components/MotionWrapper';
 import heroPortrait from '../assets/makeup-hero.webp';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
@@ -57,84 +54,38 @@ export default function HomePage() {
   return (
     <MotionWrapper className="bg-luxury-cream text-luxury-black font-sans">
       
-      {/* 1. CINEMATIC CAMPAIGN HERO */}
-      <section className="relative h-[calc(100svh-5.75rem)] min-h-0 overflow-hidden bg-luxury-black text-white flex items-center">
-        <img
-          src={heroPortrait}
-          alt="BenithaMakeup Pro bridal makeup portrait"
-          className="absolute inset-0 w-full h-full object-cover object-[68%_center] sm:object-[64%_center] lg:object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/5"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12 w-full">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-luxury-pink/10 border border-luxury-pink/35 px-3.5 py-2 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav backdrop-blur-sm">
-              <Sparkles size={14} /> Benitha Makeup Pro · Kigali
+      {/* VERSION TWO: EDITORIAL THREE-COLUMN HERO */}
+      <section className="relative min-h-[calc(100svh-6.75rem)] overflow-hidden bg-[#f4efe5] flex items-center border-b border-luxury-gold/30">
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-['Jost'] text-[18vw] font-bold tracking-[-0.08em] text-luxury-gold/[0.08] select-none pointer-events-none">BENITHA</div>
+        <div className="relative z-10 max-w-[1380px] mx-auto px-5 sm:px-8 lg:px-12 py-12 lg:py-16 w-full grid lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-4 text-center lg:text-left order-2 lg:order-1">
+            <span className="text-luxury-rosegold text-xs font-bold uppercase tracking-[0.28em]">Glow beyond beauty</span>
+            <h1 className="font-['Jost'] text-[clamp(3rem,6vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-luxury-black mt-5">Beyond your <span className="block font-['Montserrat'] italic font-medium text-luxury-rosegold">expectations.</span></h1>
+            <p className="max-w-md mx-auto lg:mx-0 text-gray-600 leading-relaxed mt-6">Refined makeup artistry for every shade of beauty, created for weddings, events, portraits, and unforgettable moments.</p>
+            <Link to="/book" className="inline-flex items-center gap-4 bg-luxury-black text-white mt-8 px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-luxury-gold hover:text-luxury-black transition-colors">Book your session <ArrowRight size={16} /></Link>
+          </div>
+
+          <div className="lg:col-span-5 order-1 lg:order-2 flex justify-center">
+            <div className="v2-hero-arch relative w-[min(78vw,500px)] h-[48vh] min-h-[390px] lg:h-[68vh] lg:max-h-[690px] overflow-hidden border-[10px] border-white shadow-[0_28px_80px_rgba(50,35,10,0.18)]">
+              <img src={heroPortrait} alt="Benitha Makeup Pro beauty model" className="w-full h-full object-cover object-[65%_center]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
             </div>
+          </div>
 
-            <h1 className="font-['Jost'] text-[clamp(2.75rem,7.5vh,5.6rem)] font-bold tracking-[-0.045em] leading-[0.94] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
-              Beyond your
-              <span className="block font-['Montserrat'] text-luxury-pink italic font-medium mt-2">expectations.</span>
-            </h1>
-
-            <div className="mt-[clamp(1rem,2.5vh,1.5rem)] flex flex-wrap items-center gap-x-3 gap-y-2 text-white/75 text-[10px] sm:text-xs uppercase tracking-[0.18em] font-nav">
-              <span>Bridal</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
-              <span>Events</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
-              <span>Editorial</span><span className="h-1 w-1 rounded-full bg-luxury-pink"></span>
-              <span>Private sessions</span>
+          <div className="lg:col-span-3 order-3 max-w-sm mx-auto lg:mx-0">
+            <div className="bg-white p-3 shadow-xl rotate-[2deg]">
+              <img src={studioPortrait} alt="Benitha Makeup Pro Kigali studio" className="w-full h-52 lg:h-64 object-cover" />
+              <div className="px-3 py-4">
+                <span className="text-[10px] uppercase tracking-[0.22em] text-luxury-rosegold font-bold">The Benitha experience</span>
+                <p className="text-sm text-gray-600 mt-2 leading-relaxed">Private studio care and on-location artistry, designed around you.</p>
+              </div>
             </div>
-
-            <p className="text-white/75 text-sm sm:text-base leading-relaxed max-w-xl mt-[clamp(1rem,2.5vh,1.5rem)]">
-              Polished, camera-ready beauty tailored to your complexion and features—never a mask, always unmistakably you.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 mt-[clamp(1.25rem,3vh,2rem)] max-w-lg">
-              <Link
-                to="/book"
-                className="bg-luxury-pink hover:bg-white text-luxury-black font-nav font-bold text-xs uppercase tracking-[0.16em] px-7 py-4 transition-all flex items-center justify-center gap-2 shadow-2xl"
-              >
-                <Calendar size={16} /> Reserve Your Session
-              </Link>
-              <Link
-                to="/gallery"
-                className="bg-black/30 backdrop-blur-sm border border-white/35 hover:border-luxury-pink text-white hover:text-luxury-pink font-nav font-bold text-xs uppercase tracking-[0.16em] px-7 py-4 transition-all flex items-center justify-center gap-2"
-              >
-                View Our Work <ArrowRight size={16} />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:flex gap-x-6 gap-y-3 mt-[clamp(1.25rem,3vh,2.5rem)] pt-4 border-t border-white/15 max-w-xl text-[10px] sm:text-xs text-white/70 font-nav uppercase tracking-wider [@media(max-height:680px)]:hidden">
-              <div className="flex items-center gap-2"><ShieldCheck size={15} className="text-luxury-pink" /> Hygienic Studio</div>
-              <div className="flex items-center gap-2"><Star size={15} className="text-luxury-pink" /> Bridal Specialist</div>
-              <div className="flex items-center gap-2 col-span-2"><CheckCircle size={15} className="text-luxury-pink" /> Studio & On-location</div>
+            <div className="grid grid-cols-2 gap-3 mt-5 text-center">
+              <div className="border border-luxury-gold/35 py-4"><strong className="font-['Jost'] text-xl">Kigali</strong><span className="block text-[9px] uppercase tracking-widest text-gray-500">Studio</span></div>
+              <div className="border border-luxury-gold/35 py-4"><strong className="font-['Jost'] text-xl">Mobile</strong><span className="block text-[9px] uppercase tracking-widest text-gray-500">On-location</span></div>
             </div>
           </div>
         </div>
-
-        <div className="hidden lg:block absolute right-8 bottom-8 z-10 text-[10px] text-white/60 uppercase tracking-[0.3em] font-nav [writing-mode:vertical-rl]">
-          BenithaMakeup Pro · Kigali
-        </div>
-
-        {/* Liquid black-and-pink transition into the next section */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 1440 110"
-          preserveAspectRatio="none"
-          className="absolute z-20 -bottom-2 sm:-bottom-3 left-0 w-full h-10 sm:h-12 lg:h-14 pointer-events-none"
-        >
-          <path
-            fill="#F7F0E3"
-            d="M0 50 C90 43 142 56 205 51 C224 49 231 54 235 75 C238 96 254 98 260 76 C266 53 276 48 302 51 C390 61 452 42 545 50 C578 53 592 59 598 84 C602 103 619 104 624 82 C630 57 643 50 676 52 C759 58 830 44 910 50 C936 52 945 58 951 75 C956 91 969 91 974 73 C980 54 993 48 1020 50 C1092 57 1165 43 1235 50 C1261 52 1272 60 1278 86 C1283 105 1298 105 1303 84 C1309 58 1323 50 1351 51 C1385 52 1412 48 1440 45 L1440 110 L0 110 Z"
-          />
-          <path
-            fill="#D4AF37"
-            d="M0 42 C88 35 150 47 220 41 C252 38 281 41 314 45 C388 54 465 34 546 42 C574 45 586 50 590 67 C594 83 606 85 612 69 C619 48 633 42 661 43 C746 49 821 37 907 42 C940 44 955 49 961 62 C966 74 978 74 983 60 C990 44 1006 40 1035 42 C1116 49 1185 36 1261 42 C1290 44 1302 51 1308 68 C1313 82 1324 81 1329 66 C1336 47 1351 41 1379 42 C1402 43 1421 40 1440 38 L1440 48 C1416 52 1393 55 1368 53 C1352 52 1345 58 1341 74 C1335 98 1307 98 1300 75 C1295 58 1286 54 1267 53 C1187 48 1118 61 1033 53 C1016 52 1007 57 1003 68 C994 94 958 94 950 70 C946 58 936 54 914 53 C828 48 752 61 660 54 C643 53 634 58 630 76 C623 103 588 102 581 74 C578 59 569 55 549 53 C468 46 390 65 311 55 C281 51 256 49 226 52 C150 58 87 47 0 54 Z"
-            opacity="0.9"
-          />
-          <circle cx="350" cy="66" r="5" fill="#D4AF37" opacity="0.85" />
-          <circle cx="1048" cy="73" r="4" fill="#A97924" opacity="0.9" />
-          <circle cx="1188" cy="62" r="3" fill="#F3D58A" opacity="0.85" />
-        </svg>
       </section>
 
       {/* Authentic studio identity */}
@@ -160,67 +111,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. SIGNATURE BRIDAL SHOWCASE */}
-      <section className="py-20 bg-luxury-cream">
+      {/* VERSION TWO: ASYMMETRIC SIGNATURE SERVICES */}
+      <section className="py-20 lg:py-28 bg-[#f4efe5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Exquisite Bridal Services</span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-luxury-black mt-2">
-              Your Beauty. Your Story. <span className="text-luxury-pink italic font-normal">Your Wedding Day.</span>
-            </h2>
-            <p className="text-gray-600 text-xs sm:text-sm mt-3 leading-relaxed">
-              Tailored bridal packages designed to make you glow effortlessly from your traditional ceremony to the evening reception.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-10 lg:mb-14">
+            <div>
+              <span className="text-luxury-gold uppercase text-xs tracking-[0.24em] font-bold font-nav">Our category</span>
+              <h2 className="font-['Jost'] text-4xl sm:text-5xl font-semibold tracking-[-0.04em] text-luxury-black mt-2">Signature services</h2>
+            </div>
+            <Link to="/packages" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.16em] font-bold border-b border-luxury-black pb-2 self-start sm:self-auto">Explore all services <ArrowRight size={14} /></Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 border border-luxury-nude shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-luxury-pink bg-luxury-cream px-3 py-1 font-nav">Studio Experience</span>
-                <h3 className="font-serif text-2xl font-bold mt-4 text-luxury-black">Bride & Matron (Studio)</h3>
-                <p className="text-gray-500 text-xs mt-2 font-mono">150,000 Frw</p>
-                <ul className="mt-6 space-y-3 text-xs text-gray-600 border-t border-gray-100 pt-6">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Exclusive studio pampering</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Customized skin prep</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Full lash enhancement</li>
-                </ul>
-              </div>
-              <button onClick={() => navigate('/book')} className="w-full mt-8 bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black py-3 text-xs font-nav font-bold uppercase tracking-widest transition-all">
-                Select Bridal Package
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:items-end">
+            {[
+              { title: 'Studio bridal', note: 'Bride & matron', img: bridalPortrait, height: 'lg:h-[420px]', span: '' },
+              { title: 'On-location artistry', note: 'Wedding day service', img: heroPortrait, height: 'lg:h-[540px]', span: 'md:col-span-2' },
+              { title: 'Event glam', note: 'Soft & full glam', img: eveningGlamPortrait, height: 'lg:h-[420px]', span: '' },
+            ].map((service) => (
+              <button key={service.title} onClick={() => navigate('/book')} className={`group relative h-[420px] overflow-hidden text-left ${service.height} ${service.span}`}>
+                <img src={service.img} alt={service.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
+                <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8 text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-luxury-gold">{service.note}</span>
+                  <span className="mt-2 flex items-center justify-between gap-4 font-['Jost'] text-2xl font-medium">
+                    {service.title}<ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
+                  </span>
+                </div>
               </button>
-            </div>
-
-            <div className="bg-luxury-black text-white p-8 border border-luxury-pink shadow-2xl relative flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-luxury-black bg-luxury-pink px-3 py-1 font-nav">Most Popular On-Location</span>
-                <h3 className="font-serif text-2xl font-bold mt-4">Bride & Matron (Field)</h3>
-                <p className="text-luxury-pink text-xs mt-2 font-mono">220,000 Frw (Without Touch-ups)</p>
-                <ul className="mt-6 space-y-3 text-xs text-gray-300 border-t border-white/10 pt-6">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> On-location home/venue service</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Premium luxury products</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Covers Bride and Matron</li>
-                </ul>
-              </div>
-              <button onClick={() => navigate('/book')} className="w-full mt-8 bg-luxury-pink text-luxury-black hover:bg-luxury-pink-light py-3 text-xs font-nav font-bold uppercase tracking-widest transition-all shadow-lg">
-                Book On-Location
-              </button>
-            </div>
-
-            <div className="bg-white p-8 border border-luxury-nude shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-luxury-pink bg-luxury-cream px-3 py-1 font-nav">Full Wedding Day VIP</span>
-                <h3 className="font-serif text-2xl font-bold mt-4 text-luxury-black">Bride & Matron (With Touch-ups)</h3>
-                <p className="text-gray-500 text-xs mt-2 font-mono">320,000 Frw</p>
-                <ul className="mt-6 space-y-3 text-xs text-gray-600 border-t border-gray-100 pt-6">
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> All day on-location assistance</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Ceremony & reception touch-ups</li>
-                  <li className="flex items-center gap-2"><CheckCircle size={14} className="text-luxury-pink" /> Complete makeup longevity lock</li>
-                </ul>
-              </div>
-              <button onClick={() => navigate('/book')} className="w-full mt-8 bg-luxury-black text-white hover:bg-luxury-pink hover:text-luxury-black py-3 text-xs font-nav font-bold uppercase tracking-widest transition-all">
-                Select VIP Package
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </section>

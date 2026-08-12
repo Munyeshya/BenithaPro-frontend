@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Settings, LogOut, Sparkles, ChevronDown, Menu, X, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -52,11 +52,11 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 shadow-md">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-luxury-gold/20">
         
         {/* TOP ANNOUNCEMENT / CONTACT BAR */}
         <div 
-          className={`bg-luxury-pink text-luxury-black font-sans text-[11px] font-medium px-4 sm:px-6 lg:px-8 overflow-hidden transition-all duration-300 ease-in-out ${
+          className={`bg-luxury-black text-luxury-gold font-sans text-[11px] font-medium px-4 sm:px-6 lg:px-8 overflow-hidden transition-all duration-300 ease-in-out ${
             scrolled ? 'max-h-0 py-0 opacity-0' : 'max-h-12 py-1.5 opacity-100'
           }`}
         >
@@ -79,14 +79,14 @@ export default function Navbar() {
         </div>
 
         {/* MAIN NAVBAR */}
-        <div className="bg-luxury-black text-white border-b border-luxury-charcoal">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="bg-white text-luxury-black">
+          <div className="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between">
             
             {/* 1. LEFT: Hamburger Menu Button & Logo */}
             <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-1.5 text-white hover:text-luxury-pink transition-colors focus:outline-none"
+                className="md:hidden p-1.5 text-luxury-black hover:text-luxury-gold transition-colors focus:outline-none"
                 aria-label="Toggle Mobile Menu"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -96,13 +96,13 @@ export default function Navbar() {
                 <img 
                   src="/benitha-logo-transparent.png"
                   alt="BenithaMakeup Pro Logo" 
-                  className="h-12 w-12 object-contain object-left transition-transform duration-300 group-hover:scale-105"
+                  className="h-16 w-16 object-contain object-left transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
             </div>
 
             {/* 2. CENTER: Proportional Navigation Links (Hidden on mobile) */}
-            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 font-sans text-xs uppercase tracking-widest font-light mx-4">
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-9 font-['Jost'] text-[11px] uppercase tracking-[0.16em] font-semibold mx-4">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -111,8 +111,8 @@ export default function Navbar() {
                     to={link.path}
                     className={`transition-colors py-1.5 border-b-2 ${
                       isActive 
-                        ? 'border-luxury-pink text-luxury-pink font-semibold' 
-                        : 'border-transparent text-gray-300 hover:text-luxury-pink'
+                        ? 'border-luxury-gold text-luxury-rosegold font-semibold'
+                        : 'border-transparent text-luxury-black hover:text-luxury-rosegold'
                     }`}
                   >
                     {link.label}
@@ -125,7 +125,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-4 shrink-0">
               <Link
                 to="/book"
-                className="bg-luxury-pink text-luxury-black hover:bg-white font-nav uppercase tracking-widest text-[10px] px-3.5 py-2 transition-colors font-bold shadow flex items-center gap-1.5"
+                className="bg-luxury-black text-white hover:bg-luxury-gold hover:text-luxury-black font-['Jost'] uppercase tracking-widest text-[10px] px-4 py-3 transition-colors font-bold flex items-center gap-1.5"
               >
                 <Sparkles size={14} /> Book Appointment
               </Link>
@@ -181,7 +181,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/admin/login"
-                  className="text-[10px] text-gray-400 hover:text-luxury-pink uppercase tracking-widest font-sans transition-colors"
+                  className="text-[10px] text-gray-500 hover:text-luxury-rosegold uppercase tracking-widest font-sans transition-colors"
                 >
                   Admin Login
                 </Link>
@@ -195,7 +195,7 @@ export default function Navbar() {
               </Link>
               <Link
                 to="/book"
-                className="bg-luxury-pink text-luxury-black font-nav uppercase tracking-widest text-[9px] px-3 py-1.5 font-bold flex items-center gap-1 shadow"
+                className="bg-luxury-black text-luxury-gold font-nav uppercase tracking-widest text-[9px] px-3 py-2 font-bold flex items-center gap-1"
               >
                 <Sparkles size={12} /> Book
               </Link>
