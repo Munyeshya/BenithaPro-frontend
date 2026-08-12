@@ -54,7 +54,7 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-40 shadow-md">
         
-        {/* TOP ANNOUNCEMENT / CONTACT BAR (Luxury Pink Theme with smooth scroll hide) */}
+        {/* TOP ANNOUNCEMENT / CONTACT BAR */}
         <div 
           className={`bg-luxury-pink text-luxury-black font-sans text-[11px] font-medium px-4 sm:px-6 lg:px-8 overflow-hidden transition-all duration-300 ease-in-out ${
             scrolled ? 'max-h-0 py-0 opacity-0' : 'max-h-12 py-1.5 opacity-100'
@@ -94,9 +94,9 @@ export default function Navbar() {
 
               <Link to="/" className="hidden md:flex items-center group">
                 <img 
-                  src="/logo2.svg" 
+                  src="/benitha-logo-transparent.png"
                   alt="BenithaMakeup Pro Logo" 
-                  className="h-9 sm:h-10 w-auto object-contain object-left" 
+                  className="h-12 w-12 object-contain object-left transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
             </div>
@@ -190,6 +190,9 @@ export default function Navbar() {
 
             {/* MOBILE QUICK ACTION */}
             <div className="flex md:hidden items-center gap-2">
+              <Link to="/" aria-label="BenithaMakeup Pro home">
+                <img src="/benitha-logo-transparent.png" alt="" className="h-10 w-10 object-contain" />
+              </Link>
               <Link
                 to="/book"
                 className="bg-luxury-pink text-luxury-black font-nav uppercase tracking-widest text-[9px] px-3 py-1.5 font-bold flex items-center gap-1 shadow"

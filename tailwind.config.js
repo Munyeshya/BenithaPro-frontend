@@ -8,19 +8,19 @@ export default {
     extend: {
       colors: {
         luxury: {
-          black: '#111111',
-          charcoal: '#1A1A1A',
+          black: '#0B0B0C',
+          charcoal: '#171515',
           white: '#FFFFFF',
-          cream: '#FFF9FB',
-          nude: '#FCE7EC',
+          cream: '#F7F0E3',
+          nude: '#E8D7B8',
           pink: {
-            light: '#FFB6C1',
-            DEFAULT: '#FF69B4',
-            dark: '#C71585',
-            berry: '#880E4F',
+            light: '#F3D58A',
+            DEFAULT: '#D4AF37',
+            dark: '#A97924',
+            berry: '#6F4B17',
           },
-          gold: '#FF69B4',
-          rosegold: '#C71585',
+          gold: '#D4AF37',
+          rosegold: '#B8893F',
         }
       },
       fontFamily: {

@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
       {
         label: 'Revenue (Frw)',
         data: monthlyData.map(item => item.income),
-        borderColor: '#FF69B4',
+        borderColor: '#D4AF37',
         backgroundColor: 'rgba(255, 105, 180, 0.1)',
         fill: true,
         tension: 0.3,

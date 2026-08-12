@@ -7,13 +7,13 @@ export default function Footer() {
     <footer className="bg-luxury-black text-gray-300 pt-16 pb-8 border-t border-luxury-charcoal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10">
         
-        {/* Brand with proportioned logo2.svg */}
+        {/* Brand */}
         <div className="space-y-4">
           <Link to="/" className="block">
             <img 
-              src="/logo2.svg" 
+              src="/benitha-logo-transparent.png"
               alt="BenithaMakeup Pro Logo" 
-              className="h-14 sm:h-16 w-auto object-contain object-left"
+              className="h-24 w-24 object-contain object-left"
             />
           </Link>
           <p className="text-xs text-gray-400 leading-relaxed">
@@ -22,7 +22,7 @@ export default function Footer() {
           <div className="flex space-x-4 pt-2">
             {/* Instagram Custom SVG Icon */}
             <a 
-              href="https://instagram.com" 
+              href="https://www.instagram.com/benitha_makeup_pro/"
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-luxury-gold transition-colors"

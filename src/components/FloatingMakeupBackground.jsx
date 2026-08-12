@@ -32,7 +32,7 @@ export default function FloatingMakeupBackground() {
               delay: el.delay
             }}
             style={{ top: el.top, left: el.left, right: el.right }}
-            className="absolute text-luxury-pink drop-shadow-[0_0_8px_rgba(255,105,180,0.4)]"
+            className="absolute text-luxury-pink drop-shadow-[0_0_8px_rgba(212,175,55,0.35)]"
           >
             <Icon size={el.size} strokeWidth={1.5} />
           </motion.div>

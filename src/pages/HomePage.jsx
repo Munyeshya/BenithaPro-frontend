@@ -9,6 +9,7 @@ import heroPortrait from '../assets/makeup-hero.webp';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
 import bridalPortrait from '../assets/makeup-bridal.webp';
+import studioPortrait from '../assets/benitha-studio.webp';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function HomePage() {
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12 w-full">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-luxury-pink/10 border border-luxury-pink/35 px-3.5 py-2 text-luxury-pink text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] font-nav backdrop-blur-sm">
-              <Sparkles size={14} /> Skin-first artistry · Kigali
+              <Sparkles size={14} /> Benitha Makeup Pro · Kigali
             </div>
 
             <h1 className="font-serif text-[clamp(2.75rem,7.5vh,5.6rem)] font-bold tracking-[-0.045em] leading-[0.94] mt-[clamp(1rem,2.5vh,1.5rem)] drop-shadow-2xl">
@@ -122,18 +123,40 @@ export default function HomePage() {
           className="absolute z-20 -bottom-2 sm:-bottom-3 left-0 w-full h-10 sm:h-12 lg:h-14 pointer-events-none"
         >
           <path
-            fill="#FFF9FB"
+            fill="#F7F0E3"
             d="M0 50 C90 43 142 56 205 51 C224 49 231 54 235 75 C238 96 254 98 260 76 C266 53 276 48 302 51 C390 61 452 42 545 50 C578 53 592 59 598 84 C602 103 619 104 624 82 C630 57 643 50 676 52 C759 58 830 44 910 50 C936 52 945 58 951 75 C956 91 969 91 974 73 C980 54 993 48 1020 50 C1092 57 1165 43 1235 50 C1261 52 1272 60 1278 86 C1283 105 1298 105 1303 84 C1309 58 1323 50 1351 51 C1385 52 1412 48 1440 45 L1440 110 L0 110 Z"
           />
           <path
-            fill="#FF69B4"
+            fill="#D4AF37"
             d="M0 42 C88 35 150 47 220 41 C252 38 281 41 314 45 C388 54 465 34 546 42 C574 45 586 50 590 67 C594 83 606 85 612 69 C619 48 633 42 661 43 C746 49 821 37 907 42 C940 44 955 49 961 62 C966 74 978 74 983 60 C990 44 1006 40 1035 42 C1116 49 1185 36 1261 42 C1290 44 1302 51 1308 68 C1313 82 1324 81 1329 66 C1336 47 1351 41 1379 42 C1402 43 1421 40 1440 38 L1440 48 C1416 52 1393 55 1368 53 C1352 52 1345 58 1341 74 C1335 98 1307 98 1300 75 C1295 58 1286 54 1267 53 C1187 48 1118 61 1033 53 C1016 52 1007 57 1003 68 C994 94 958 94 950 70 C946 58 936 54 914 53 C828 48 752 61 660 54 C643 53 634 58 630 76 C623 103 588 102 581 74 C578 59 569 55 549 53 C468 46 390 65 311 55 C281 51 256 49 226 52 C150 58 87 47 0 54 Z"
             opacity="0.9"
           />
-          <circle cx="350" cy="66" r="5" fill="#FF69B4" opacity="0.85" />
-          <circle cx="1048" cy="73" r="4" fill="#C71585" opacity="0.9" />
-          <circle cx="1188" cy="62" r="3" fill="#FFB6C1" opacity="0.85" />
+          <circle cx="350" cy="66" r="5" fill="#D4AF37" opacity="0.85" />
+          <circle cx="1048" cy="73" r="4" fill="#A97924" opacity="0.9" />
+          <circle cx="1188" cy="62" r="3" fill="#F3D58A" opacity="0.85" />
         </svg>
+      </section>
+
+      {/* Authentic studio identity */}
+      <section className="bg-luxury-cream py-16 lg:py-24 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="relative max-w-lg mx-auto lg:mx-0 w-full">
+            <div className="absolute -inset-4 border border-luxury-gold/35 translate-x-6 translate-y-6"></div>
+            <img src={studioPortrait} alt="Benitha Makeup Pro studio in Kigali" className="relative w-full h-[430px] lg:h-[560px] object-cover shadow-2xl" />
+            <div className="absolute bottom-5 left-5 bg-luxury-black text-luxury-gold px-4 py-3 text-[10px] uppercase tracking-[0.22em] font-nav">Our Kigali studio</div>
+          </div>
+
+          <div className="max-w-xl">
+            <span className="text-luxury-gold uppercase text-xs tracking-[0.24em] font-bold font-nav">The real Benitha experience</span>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-luxury-black leading-tight mt-4">A beauty space built to make you <span className="text-luxury-rosegold italic font-normal">feel seen.</span></h2>
+            <p className="text-gray-600 leading-relaxed mt-6">From the signature black-and-gold studio to every finishing detail, Benitha Makeup Pro is designed around warm hospitality, refined artistry, and makeup that photographs beautifully without hiding your natural features.</p>
+            <div className="grid grid-cols-2 gap-4 mt-8 border-y border-luxury-gold/25 py-6">
+              <div><strong className="block font-serif text-2xl text-luxury-black">Kigali</strong><span className="text-[10px] uppercase tracking-widest text-gray-500">Private studio</span></div>
+              <div><strong className="block font-serif text-2xl text-luxury-black">On-location</strong><span className="text-[10px] uppercase tracking-widest text-gray-500">Bridal & events</span></div>
+            </div>
+            <a href="https://www.instagram.com/benitha_makeup_pro/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-8 bg-luxury-black text-luxury-gold px-7 py-4 text-xs uppercase tracking-[0.18em] font-bold font-nav hover:bg-luxury-gold hover:text-luxury-black transition-colors">Visit our Instagram <ArrowRight size={15} /></a>
+          </div>
+        </div>
       </section>
 
       {/* 2. SIGNATURE BRIDAL SHOWCASE */}
@@ -349,7 +372,7 @@ export default function HomePage() {
         <span className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center">
           <span className="absolute inset-0 rounded-full border border-luxury-pink/50 whatsapp-ring"></span>
           <span className="absolute inset-1 rounded-full bg-luxury-pink/20 animate-ping"></span>
-          <span className="relative h-full w-full rounded-full bg-luxury-black border-2 border-luxury-pink text-luxury-pink shadow-[0_10px_35px_rgba(255,105,180,0.4)] flex items-center justify-center transition-all duration-300 group-hover:bg-luxury-pink group-hover:text-luxury-black group-hover:rotate-[-8deg] group-hover:scale-105">
+          <span className="relative h-full w-full rounded-full bg-luxury-black border-2 border-luxury-pink text-luxury-pink shadow-[0_10px_35px_rgba(212,175,55,0.4)] flex items-center justify-center transition-all duration-300 group-hover:bg-luxury-pink group-hover:text-luxury-black group-hover:rotate-[-8deg] group-hover:scale-105">
             <MessageCircle size={27} strokeWidth={2.2} />
             <span className="absolute top-1 right-1.5 h-2.5 w-2.5 rounded-full bg-luxury-pink border-2 border-luxury-black group-hover:bg-white"></span>
           </span>
