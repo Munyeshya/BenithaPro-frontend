@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingMakeupBackground from './components/FloatingMakeupBackground';
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+       <LanguageProvider>
         <Router>
           <Routes>
             {/* ================= PUBLIC CLIENT ROUTES ================= */}
@@ -59,6 +61,7 @@ export default function App() {
             </Route>
           </Routes>
         </Router>
+       </LanguageProvider>
       </ToastProvider>
     </AuthProvider>
   );

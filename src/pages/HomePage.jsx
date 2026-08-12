@@ -7,9 +7,12 @@ import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
 import bridalPortrait from '../assets/makeup-bridal.webp';
 import studioPortrait from '../assets/benitha-studio-refined.webp';
+import heroCutout from '../assets/hero-cutout.png';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [sliderPosition, setSliderPosition] = useState(50);
   const [portfolioTab, setPortfolioTab] = useState('all');
@@ -57,22 +60,19 @@ export default function HomePage() {
       {/* VERSION TWO: EDITORIAL THREE-COLUMN HERO */}
       <section className="relative min-h-[calc(100svh-6.75rem)] overflow-hidden bg-[#f4efe5] flex items-center border-b border-luxury-gold/30">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center font-['Jost'] text-[18vw] font-bold tracking-[-0.08em] text-luxury-gold/[0.08] select-none pointer-events-none">BENITHA</div>
-        <div className="relative z-10 max-w-[1380px] mx-auto px-5 sm:px-8 lg:px-12 py-12 lg:py-16 w-full grid lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-4 text-center lg:text-left order-2 lg:order-1">
-            <span className="text-luxury-rosegold text-xs font-bold uppercase tracking-[0.28em]">Glow beyond beauty</span>
-            <h1 className="font-['Jost'] text-[clamp(3rem,6vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-luxury-black mt-5">Beyond your <span className="block font-['Montserrat'] italic font-medium text-luxury-rosegold">expectations.</span></h1>
-            <p className="max-w-md mx-auto lg:mx-0 text-gray-600 leading-relaxed mt-6">Refined makeup artistry for every shade of beauty, created for weddings, events, portraits, and unforgettable moments.</p>
-            <Link to="/book" className="inline-flex items-center gap-4 bg-luxury-black text-white mt-8 px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-luxury-gold hover:text-luxury-black transition-colors">Book your session <ArrowRight size={16} /></Link>
+        <div className="relative z-10 max-w-[1380px] mx-auto px-5 sm:px-8 lg:px-12 pt-10 w-full grid lg:grid-cols-12 gap-4 items-end">
+          <div className="lg:col-span-5 text-center lg:text-left pb-12 lg:pb-24 order-2 lg:order-1 relative z-20">
+            <span className="text-luxury-rosegold text-xs font-bold uppercase tracking-[0.28em]">{t('Glow beyond beauty')}</span>
+            <h1 className="font-['Jost'] text-[clamp(3rem,6vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-luxury-black mt-5">{t('Beyond your')} <span className="block font-['Montserrat'] italic font-medium text-luxury-rosegold">{t('expectations.')}</span></h1>
+            <p className="max-w-md mx-auto lg:mx-0 text-gray-600 leading-relaxed mt-6">{t('Refined makeup artistry for every shade of beauty, created for weddings, events, portraits, and unforgettable moments.')}</p>
+            <Link to="/book" className="inline-flex items-center gap-4 bg-luxury-black text-white mt-8 px-7 py-4 text-xs font-bold uppercase tracking-[0.18em] hover:bg-luxury-gold hover:text-luxury-black transition-colors">{t('Book your session')} <ArrowRight size={16} /></Link>
           </div>
 
-          <div className="lg:col-span-5 order-1 lg:order-2 flex justify-center">
-            <div className="v2-hero-arch relative w-[min(78vw,500px)] h-[48vh] min-h-[390px] lg:h-[68vh] lg:max-h-[690px] overflow-hidden border-[10px] border-white shadow-[0_28px_80px_rgba(50,35,10,0.18)]">
-              <img src={heroPortrait} alt="Benitha Makeup Pro beauty model" className="w-full h-full object-cover object-[65%_center]" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
-            </div>
+          <div className="lg:col-span-5 order-1 lg:order-2 flex justify-center self-stretch min-h-[480px] lg:min-h-[650px] relative">
+            <img src={heroCutout} alt="Benitha Makeup Pro beauty model" className="absolute bottom-0 h-full max-h-[720px] w-auto max-w-none object-contain object-bottom drop-shadow-[0_24px_28px_rgba(44,28,8,0.16)]" />
           </div>
 
-          <div className="lg:col-span-3 order-3 max-w-sm mx-auto lg:mx-0">
+          <div className="lg:col-span-2 order-3 max-w-xs mx-auto lg:mx-0 pb-12 lg:pb-24 relative z-20">
             <div className="bg-white p-3 shadow-xl rotate-[2deg]">
               <img src={studioPortrait} alt="Benitha Makeup Pro Kigali studio" className="w-full h-52 lg:h-64 object-cover" />
               <div className="px-3 py-4">
@@ -112,29 +112,29 @@ export default function HomePage() {
       </section>
 
       {/* VERSION TWO: ASYMMETRIC SIGNATURE SERVICES */}
-      <section className="py-20 lg:py-28 bg-[#f4efe5]">
+      <section className="py-20 lg:py-28 bg-luxury-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-10 lg:mb-14">
             <div>
               <span className="text-luxury-gold uppercase text-xs tracking-[0.24em] font-bold font-nav">Our category</span>
-              <h2 className="font-['Jost'] text-4xl sm:text-5xl font-semibold tracking-[-0.04em] text-luxury-black mt-2">Signature services</h2>
+              <h2 className="font-['Jost'] text-4xl sm:text-6xl font-semibold tracking-[-0.04em] text-white mt-2">{t('Signature services')}</h2>
             </div>
-            <Link to="/packages" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.16em] font-bold border-b border-luxury-black pb-2 self-start sm:self-auto">Explore all services <ArrowRight size={14} /></Link>
+            <Link to="/packages" className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.16em] font-bold text-luxury-gold border-b border-luxury-gold pb-2 self-start sm:self-auto">{t('Explore all services')} <ArrowRight size={14} /></Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {[
-              { title: 'Studio bridal', note: 'Bride & matron', img: bridalPortrait, height: 'lg:h-[420px]', span: '' },
-              { title: 'On-location artistry', note: 'Wedding day service', img: heroPortrait, height: 'lg:h-[540px]', span: 'md:col-span-2' },
-              { title: 'Event glam', note: 'Soft & full glam', img: eveningGlamPortrait, height: 'lg:h-[420px]', span: '' },
+              { title: 'Studio bridal', note: 'Bride & matron', img: bridalPortrait, span: 'lg:col-span-3' },
+              { title: 'On-location artistry', note: 'Wedding day service', img: heroPortrait, span: 'lg:col-span-6' },
+              { title: 'Event glam', note: 'Soft & full glam', img: eveningGlamPortrait, span: 'lg:col-span-3' },
             ].map((service) => (
-              <button key={service.title} onClick={() => navigate('/book')} className={`group relative h-[420px] overflow-hidden text-left ${service.height} ${service.span}`}>
+              <button key={service.title} onClick={() => navigate('/book')} className={`group relative h-[500px] overflow-hidden text-left ${service.span}`}>
                 <img src={service.img} alt={service.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
                 <div className="absolute inset-x-0 bottom-0 p-6 lg:p-8 text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-luxury-gold">{service.note}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-luxury-gold">{t(service.note)}</span>
                   <span className="mt-2 flex items-center justify-between gap-4 font-['Jost'] text-2xl font-medium">
-                    {service.title}<ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
+                    {t(service.title)}<ArrowRight className="transition-transform group-hover:translate-x-1" size={20} />
                   </span>
                 </div>
               </button>

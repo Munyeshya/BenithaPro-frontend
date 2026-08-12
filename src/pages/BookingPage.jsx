@@ -8,10 +8,12 @@ import {
 import API from '../services/api';
 import CalendarPicker from '../components/CalendarPicker';
 import { demoCategories, demoPaymentMethods, demoSchedule } from '../data/demoData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const preselectedPackageId = searchParams.get('package');
 
   // Steps: 1 = Package, 2 = Calendar & Starting Time, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
@@ -253,9 +255,9 @@ export default function BookingPage() {
 
         {/* Page Header */}
         <div className="text-center mb-10 max-w-2xl mx-auto">
-          <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">Seamless Online Reservation</span>
+          <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">{t('Seamless Online Reservation')}</span>
           <h1 className="font-['Jost'] text-5xl sm:text-6xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">
-            Book Your <span className="text-luxury-rosegold italic font-normal">Glam Experience</span>
+            {t('Book Your')} <span className="text-luxury-rosegold italic font-normal">{t('Glam Experience')}</span>
           </h1>
         </div>
 
@@ -263,10 +265,10 @@ export default function BookingPage() {
         {currentStep <= 4 && (
           <div className="flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
             {[
-              { step: 1, label: 'Package' },
-              { step: 2, label: 'Calendar & Time' },
-              { step: 3, label: 'Your Info' },
-              { step: 4, label: 'Deposit' },
+              { step: 1, label: t('Package') },
+              { step: 2, label: t('Calendar & Time') },
+              { step: 3, label: t('Your Info') },
+              { step: 4, label: t('Deposit') },
             ].map(({ step, label }) => (
               <div key={step} className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${

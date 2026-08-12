@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Search, AlertCircle, Loader2 } from 'lucide-react';
 import MotionWrapper from '../components/MotionWrapper';
 import API from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function TrackAppointmentPage() {
+  const { t } = useLanguage();
   const [token, setToken] = useState('');
   const [appointment, setAppointment] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,17 +33,17 @@ export default function TrackAppointmentPage() {
       <div className="max-w-5xl mx-auto grid lg:grid-cols-5 gap-10 lg:gap-16 items-start">
         <div className="lg:col-span-2 lg:sticky lg:top-32">
         <div className="text-left space-y-2">
-          <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Reservation Status</span>
+          <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">{t('Reservation Status')}</span>
           <h1 className="font-['Jost'] text-5xl sm:text-6xl leading-[0.95] tracking-[-0.05em] font-semibold text-luxury-black mt-4">
-            Track Your <span className="text-luxury-pink italic font-normal">Appointment</span>
+            {t('Track Your')} <span className="text-luxury-pink italic font-normal">{t('Appointment')}</span>
           </h1>
-          <p className="text-gray-600 text-sm mt-5 leading-relaxed">Enter your secure booking code to view the live status of your Benitha appointment.</p>
+          <p className="text-gray-600 text-sm mt-5 leading-relaxed">{t('Enter your secure booking code to view the live status of your Benitha appointment.')}</p>
         </div>
         </div>
         <div className="lg:col-span-3 space-y-6">
         <form onSubmit={handleTrack} className="bg-white p-7 lg:p-10 border-t-4 border-luxury-gold shadow-[0_24px_60px_rgba(25,18,4,0.08)] space-y-5">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">Secure Tracking Token / ID</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">{t('Secure Tracking Token / ID')}</label>
             <div className="flex gap-2">
               <input
                 type="text"

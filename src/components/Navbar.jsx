@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Settings, LogOut, Sparkles, ChevronDown, Menu, X, Phone, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AdminSettingsModal from './AdminSettingsModal';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar() {
   const { admin, logout } = useAuth();
@@ -14,6 +15,7 @@ export default function Navbar() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const { language, setLanguage, t } = useLanguage();
 
   // Track window scroll to toggle top bar visibility
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function Navbar() {
 
         {/* MAIN NAVBAR */}
         <div className="bg-white text-luxury-black">
-          <div className="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 grid grid-cols-[1fr_auto_1fr] items-center gap-5">
             
             {/* 1. LEFT: Hamburger Menu Button & Logo */}
             <div className="flex items-center gap-3 shrink-0">
@@ -102,7 +104,7 @@ export default function Navbar() {
             </div>
 
             {/* 2. CENTER: Proportional Navigation Links (Hidden on mobile) */}
-            <nav className="hidden md:flex items-center space-x-6 lg:space-x-9 font-['Jost'] text-[11px] uppercase tracking-[0.16em] font-semibold mx-4">
+            <nav className="hidden md:flex items-center justify-center gap-5 lg:gap-7 font-['Jost'] text-[13px] tracking-[0.02em] font-medium">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -115,19 +117,22 @@ export default function Navbar() {
                         : 'border-transparent text-luxury-black hover:text-luxury-rosegold'
                     }`}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 );
               })}
             </nav>
 
             {/* 3. RIGHT: Book Appointment & Admin Login / Dropdown */}
-            <div className="hidden md:flex items-center gap-4 shrink-0">
+            <div className="hidden md:flex items-center justify-end gap-3 shrink-0">
+              <div className="flex border border-luxury-gold/40 p-0.5 font-['Jost'] text-[10px] font-semibold" aria-label="Language">
+                {['en', 'rw'].map(code => <button key={code} onClick={() => setLanguage(code)} className={`px-2 py-1.5 ${language === code ? 'bg-luxury-black text-luxury-gold' : 'text-gray-500'}`}>{code === 'rw' ? 'KIN' : 'ENG'}</button>)}
+              </div>
               <Link
                 to="/book"
                 className="bg-luxury-black text-white hover:bg-luxury-gold hover:text-luxury-black font-['Jost'] uppercase tracking-widest text-[10px] px-4 py-3 transition-colors font-bold flex items-center gap-1.5"
               >
-                <Sparkles size={14} /> Book Appointment
+                <Sparkles size={14} /> {t('Book Appointment')}
               </Link>
 
               {admin ? (
@@ -190,6 +195,7 @@ export default function Navbar() {
 
             {/* MOBILE QUICK ACTION */}
             <div className="flex md:hidden items-center gap-2">
+              <button onClick={() => setLanguage(language === 'en' ? 'rw' : 'en')} className="font-['Jost'] text-[10px] font-bold border border-luxury-gold px-2 py-1.5">{language === 'en' ? 'KIN' : 'ENG'}</button>
               <Link to="/" aria-label="BenithaMakeup Pro home">
                 <img src="/benitha-logo-transparent.png" alt="" className="h-10 w-10 object-contain" />
               </Link>
@@ -197,7 +203,7 @@ export default function Navbar() {
                 to="/book"
                 className="bg-luxury-black text-luxury-gold font-nav uppercase tracking-widest text-[9px] px-3 py-2 font-bold flex items-center gap-1"
               >
-                <Sparkles size={12} /> Book
+                <Sparkles size={12} /> {t('Book')}
               </Link>
             </div>
 
@@ -221,7 +227,7 @@ export default function Navbar() {
                         : 'text-gray-300 hover:bg-luxury-charcoal hover:text-luxury-pink'
                     }`}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </Link>
                 );
               })}

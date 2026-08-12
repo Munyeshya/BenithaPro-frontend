@@ -6,6 +6,7 @@ import API from '../services/api';
 import MotionWrapper from '../components/MotionWrapper';
 import { demoCategories } from '../data/demoData';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function PackagesPage() {
   const [categories, setCategories] = useState([]);
@@ -13,6 +14,7 @@ export default function PackagesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchPackages();
@@ -45,9 +47,9 @@ export default function PackagesPage() {
       <div className="relative overflow-hidden bg-luxury-black text-white py-20 lg:py-28 px-4 text-center mb-16">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 font-['Jost'] text-[17vw] font-bold tracking-[-0.07em] text-white/[0.035] pointer-events-none">SERVICES</div>
         <div className="relative max-w-7xl mx-auto">
-        <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Exquisite Beauty Services</span>
+        <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">{t('Exquisite Beauty Services')}</span>
         <h1 className="font-['Jost'] text-5xl sm:text-7xl font-semibold tracking-[-0.05em] text-white mt-3">
-          Packages & <span className="text-luxury-pink italic font-normal">Pricing</span>
+          {t('Packages &')} <span className="text-luxury-pink italic font-normal">{t('Pricing')}</span>
         </h1>
         <p className="text-gray-400 max-w-2xl mx-auto mt-5 text-sm leading-relaxed">
           Bespoke glam services designed for brides, special events, and photoshoots in Kigali. Select your service to start booking.
@@ -64,7 +66,7 @@ export default function PackagesPage() {
                   : 'bg-white text-gray-700 hover:bg-luxury-nude border border-luxury-nude'
               }`}
             >
-              All Services ({allPackages.length})
+              {t('All Services')} ({allPackages.length})
             </button>
             {categories.map((cat) => (
               <button
@@ -87,7 +89,7 @@ export default function PackagesPage() {
       {loading && (
         <div className="flex flex-col justify-center items-center py-20">
           <Loader2 className="animate-spin text-luxury-pink mb-3" size={36} />
-          <span className="text-sm font-medium text-gray-500 font-nav uppercase tracking-wider">Loading services...</span>
+          <span className="text-sm font-medium text-gray-500 font-nav uppercase tracking-wider">{t('Loading services...')}</span>
         </div>
       )}
 
@@ -153,7 +155,7 @@ export default function PackagesPage() {
                     {/* Pricing & Booking CTA */}
                     <div className="mt-6 pt-4 border-t border-gray-100">
                       <div className="flex items-baseline justify-between mb-4">
-                        <span className="text-xs text-gray-400 font-medium font-nav uppercase tracking-wider">Service Fee</span>
+                        <span className="text-xs text-gray-400 font-medium font-nav uppercase tracking-wider">{t('Service Fee')}</span>
                         <span className="font-serif text-2xl font-bold text-luxury-black">
                           {Number(pkg.price).toLocaleString()} <span className="text-xs font-sans font-normal text-gray-500">Frw</span>
                         </span>
@@ -163,7 +165,7 @@ export default function PackagesPage() {
                         onClick={() => navigate(`/book?package=${pkg.id}`)}
                         className="w-full bg-luxury-black hover:bg-luxury-pink text-white hover:text-luxury-black font-nav font-semibold text-xs uppercase tracking-widest py-3.5 transition-all duration-300 flex items-center justify-center gap-2 shadow-md"
                       >
-                        Book Service <ArrowRight size={14} />
+                        {t('Book Service')} <ArrowRight size={14} />
                       </button>
                     </div>
                   </div>

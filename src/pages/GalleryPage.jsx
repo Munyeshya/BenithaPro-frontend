@@ -3,6 +3,7 @@ import heroPortrait from '../assets/makeup-hero.webp';
 import softGlamPortrait from '../assets/makeup-soft-glam.webp';
 import eveningGlamPortrait from '../assets/makeup-evening-glam.webp';
 import bridalPortrait from '../assets/makeup-bridal.webp';
+import { useLanguage } from '../context/LanguageContext';
 
 const galleryLooks = [
   { src: bridalPortrait, alt: 'Luxury bridal makeup on a Black bride' },
@@ -14,18 +15,19 @@ const galleryLooks = [
 ];
 
 export default function GalleryPage() {
+  const { t } = useLanguage();
   return (
     <MotionWrapper className="pb-24 bg-white min-h-screen">
       <div className="bg-[#f4efe5] py-20 lg:py-28 px-4 text-center">
-        <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">Portfolio & Artistry</span>
+        <span className="text-luxury-pink uppercase text-xs tracking-widest font-semibold font-nav">{t('Portfolio & Artistry')}</span>
         <h1 className="font-['Jost'] text-5xl sm:text-7xl font-semibold tracking-[-0.05em] text-luxury-black mt-3">
-          Makeup <span className="font-['Montserrat'] text-luxury-pink italic font-medium">Gallery</span>
+          {t('Makeup')} <span className="font-['Montserrat'] text-luxury-pink italic font-medium">{t('Gallery')}</span>
         </h1>
-        <p className="text-gray-600 text-sm max-w-xl mx-auto mt-5">Explore bridal, editorial, and special-event artistry created in Kigali.</p>
+        <p className="text-gray-600 text-sm max-w-xl mx-auto mt-5">{t('Explore bridal, editorial, and special-event artistry created in Kigali.')}</p>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         <div className="flex items-end justify-between border-b border-luxury-gold/40 pb-5 mb-8">
-          <h2 className="font-['Jost'] text-3xl font-medium">Selected looks</h2>
+          <h2 className="font-['Jost'] text-3xl font-medium">{t('Selected looks')}</h2>
           <span className="text-[10px] uppercase tracking-[0.22em] text-gray-500">Benitha Makeup Pro</span>
         </div>
 
