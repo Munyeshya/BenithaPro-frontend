@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { 
-  Calendar, User, CreditCard, Upload,
-  CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, 
-  Loader2, Sparkles, MessageCircle, AlertTriangle
+import {
+  Smartphone, Landmark, Banknote, MapPin, Minus, Plus,
+  CheckCircle2, AlertCircle, Loader2, ChevronLeft, CalendarDays, Clock3, UsersRound, ClipboardList, MessageCircle, Copy
 } from 'lucide-react';
 import API from '../services/api';
-import CalendarPicker from '../components/CalendarPicker';
 import { demoCategories, demoPaymentMethods, demoSchedule } from '../data/demoData';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -15,6 +13,7 @@ export default function BookingPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const preselectedPackageId = searchParams.get('package');
+  const preselectedCategoryId = searchParams.get('category');
 
   // Steps: 1 = Package, 2 = Calendar & Starting Time, 3 = Personal Details, 4 = Payment & Deposit, 5 = Confirmation
   const [currentStep, setCurrentStep] = useState(1);
@@ -60,6 +59,7 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [createdAppointment, setCreatedAppointment] = useState(null);
+  const [bookingIdCopied, setBookingIdCopied] = useState(false);
 
   // Fetch Categories, Payment Methods & Blocked Periods on Mount
   useEffect(() => {
@@ -70,12 +70,18 @@ export default function BookingPage() {
     try {
       const [catRes, payRes, blockRes] = await Promise.all([
         API.get('/categories-packages/'),
-        API.get('/payment-methods/'),
+        API.get('/payment-methods/').catch(() => ({ data: demoPaymentMethods })),
         API.get('/blocked-periods/').catch(() => ({ data: [] }))
       ]);
 
       setCategories(catRes.data);
       setPaymentMethods(payRes.data);
+
+      if (preselectedCategoryId && catRes.data.length > 0) {
+        const requestedCategory = catRes.data.find(cat => String(cat.id) === preselectedCategoryId)
+          || catRes.data[Number(preselectedCategoryId) - 1];
+        if (requestedCategory) setSelectedCategory(requestedCategory.id);
+      }
 
       if (blockRes.data && Array.isArray(blockRes.data)) {
         const full = blockRes.data.filter(b => b.block_full_day).map(b => b.blocked_date);
@@ -99,6 +105,12 @@ export default function BookingPage() {
       setCategories(demoCategories);
       setPaymentMethods(demoPaymentMethods);
 
+      if (preselectedCategoryId) {
+        const requestedCategory = demoCategories.find(cat => String(cat.id) === preselectedCategoryId)
+          || demoCategories[Number(preselectedCategoryId) - 1];
+        if (requestedCategory) setSelectedCategory(requestedCategory.id);
+      }
+
       if (preselectedPackageId) {
         for (const cat of demoCategories) {
           const found = cat.packages.find(p => p.id === parseInt(preselectedPackageId));
@@ -120,6 +132,14 @@ export default function BookingPage() {
   }, [appointmentDate, selectedPackage]);
 
   const fetchAvailableSlots = async () => {
+    if (!selectedPackage || Number(selectedPackage.id) >= 100) {
+      setTimelineSegments(demoSchedule.timeline_segments);
+      setOpeningTime(demoSchedule.opening_time);
+      setClosingTime(demoSchedule.closing_time);
+      setSlotError('');
+      setCheckingSlots(false);
+      return;
+    }
     try {
       setCheckingSlots(true);
       setSlotError('');
@@ -216,72 +236,104 @@ export default function BookingPage() {
       const data = new FormData();
       data.append('client_name', formData.client_name);
       data.append('whatsapp_number', formData.whatsapp_number);
-      data.append('alternative_phone', formData.alternative_phone);
-      data.append('email', formData.email);
-      data.append('category', selectedCategory);
+      if (formData.alternative_phone) data.append('alternative_phone', formData.alternative_phone);
+      if (formData.email) data.append('email', formData.email);
       data.append('package', selectedPackage.id);
       data.append('appointment_location_type', formData.appointment_location_type);
-      data.append('field_location', formData.field_location);
+      if (formData.field_location) data.append('field_location', formData.field_location);
       data.append('number_of_people', formData.number_of_people);
       data.append('appointment_date', appointmentDate);
       data.append('start_time', selectedTime);
       data.append('deposit_paid', formData.deposit_paid);
-      data.append('amount_paid', formData.amount_paid || selectedPackage.price * 0.3);
-      if (formData.payment_method) {
+      data.append('amount_paid', formData.amount_paid || selectedPackage.price * 0.5);
+      if (formData.payment_method && formData.payment_method !== 'cash') {
         data.append('payment_method', formData.payment_method);
       }
       if (paymentProofFile) {
         data.append('payment_proof', paymentProofFile);
       }
-      data.append('special_request', formData.special_request);
+      if (formData.special_request) data.append('special_request', formData.special_request);
 
-      const response = await API.post('/appointments/create/', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await API.post('/appointments/create/', data);
 
       setCreatedAppointment(response.data);
       setCurrentStep(5);
     } catch (err) {
       console.error('Submission failed:', err);
-      setSubmitError(err.response?.data?.error || 'Failed to submit appointment. Please try again.');
+      const responseErrors = err.response?.data;
+      const readableError = responseErrors && typeof responseErrors === 'object'
+        ? Object.entries(responseErrors).map(([field, messages]) => `${field.replaceAll('_', ' ')}: ${Array.isArray(messages) ? messages.join(' ') : messages}`).join(' · ')
+        : responseErrors;
+      setSubmitError(readableError || err.message || 'Failed to submit appointment. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const displayedStep = currentStep === 3 ? 2 : currentStep;
+  const confirmationWhatsAppUrl = createdAppointment?.whatsapp_url || (createdAppointment
+    ? `https://wa.me/250795509978?text=${encodeURIComponent(`Hello Benitha Makeup Pro! My booking ${createdAppointment.appointment_id} for ${createdAppointment.package_name_snapshot} has been submitted. Please confirm it.`)}`
+    : 'https://wa.me/250795509978');
+  const addBookingToCalendar = () => {
+    if (!createdAppointment) return;
+    const compactDate = createdAppointment.appointment_date.replaceAll('-', '');
+    const compactTime = createdAppointment.start_time.replaceAll(':', '').slice(0, 4) + '00';
+    const calendar = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${compactDate}T${compactTime}\nSUMMARY:Benitha Makeup Pro - ${createdAppointment.package_name_snapshot}\nLOCATION:${createdAppointment.field_location || 'Kigali, Rwanda'}\nDESCRIPTION:Booking ID: ${createdAppointment.appointment_id}\nEND:VEVENT\nEND:VCALENDAR`;
+    const url = URL.createObjectURL(new Blob([calendar], { type: 'text/calendar' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${createdAppointment.appointment_id}.ics`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const copyBookingId = async () => {
+    if (!createdAppointment?.appointment_id) return;
+    await navigator.clipboard.writeText(createdAppointment.appointment_id);
+    setBookingIdCopied(true);
+    window.setTimeout(() => setBookingIdCopied(false), 1800);
+  };
+
   return (
-    <div className="editorial-booking figma-booking min-h-screen">
+    <div className={`editorial-booking figma-booking min-h-screen booking-step-${currentStep} ${currentStep === 3 ? 'booking-info-screen' : ''}`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        {currentStep <= 4 && (
+          <button
+            type="button"
+            className="booking-back-v3"
+            onClick={() => currentStep === 1 ? navigate('/packages') : setCurrentStep(step => Math.max(1, step - 1))}
+            aria-label={currentStep === 1 ? t('Back to services') : t('Previous booking step')}
+          >
+            <ChevronLeft aria-hidden="true" />
+          </button>
+        )}
+
         {/* Page Header */}
-        <div className="text-center mb-10 max-w-2xl mx-auto">
-          <span className="text-luxury-gold uppercase text-xs tracking-widest font-semibold">{t('Seamless Online Reservation')}</span>
-          <h1 className="font-['Cormorant_Garamond'] text-3xl sm:text-4xl font-semibold text-luxury-black mt-1 uppercase">
-            {t('Book Your')} <span className="text-luxury-rosegold italic font-normal">{t('Glam Experience')}</span>
-          </h1>
-        </div>
+        {currentStep <= 4 && <div className="booking-page-header text-center mb-10 max-w-2xl mx-auto">
+          {currentStep === 1 ? <><h1>{selectedPackage?.category_name || categories.find(c => c.id === selectedCategory)?.name || t('Bridal Makeup')}</h1><p>{t('Choose your perfect package')}</p></> : currentStep === 2 ? <><h1>{t('Book Your Appointment')}</h1><p>{t('Fill in your booking details')}</p></> : currentStep === 3 ? <><h1>{t('Your Information')}</h1><p>{t('We need a few details')}</p></> : <><h1>{t('Secure Your Booking')}</h1><p>{t('Complete your payment')}</p></>}
+        </div>}
 
         {/* Multi-Step Progress Tracker */}
         {currentStep <= 4 && (
-          <div className="flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
+          <div className="booking-progress flex justify-between items-center mb-10 bg-white p-4 rounded-2xl border border-luxury-nude shadow-sm">
             {[
-              { step: 1, label: t('Package') },
-              { step: 2, label: t('Calendar & Time') },
-              { step: 3, label: t('Your Info') },
-              { step: 4, label: t('Deposit') },
+              { step: 1, label: t('Service') },
+              { step: 2, label: t('Details') },
+              { step: 3, label: t('Information') },
+              { step: 4, label: t('Payment') },
             ].map(({ step, label }) => (
-              <div key={step} className="flex items-center gap-2">
+              <div key={step} className={`booking-progress-step ${displayedStep === step ? 'is-active' : displayedStep > step ? 'is-complete' : 'is-upcoming'} flex items-center gap-2`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  currentStep === step 
-                    ? 'bg-luxury-gold text-luxury-black scale-110 shadow' 
-                    : currentStep > step 
+                  displayedStep === step
+                    ? 'bg-luxury-gold text-luxury-black scale-110 shadow'
+                    : displayedStep > step
                     ? 'bg-luxury-black text-white' 
                     : 'bg-gray-100 text-gray-400'
                 }`}>
-                  {currentStep > step ? '✓' : step}
+                  {displayedStep > step ? '✓' : step}
                 </div>
                 <span className={`text-xs hidden sm:inline font-medium ${
-                  currentStep === step ? 'text-luxury-black font-semibold' : 'text-gray-400'
+                  displayedStep === step ? 'text-luxury-black font-semibold' : 'text-gray-400'
                 }`}>
                   {label}
                 </span>
@@ -292,89 +344,30 @@ export default function BookingPage() {
 
         {/* STEP 1: CATEGORY & PACKAGE SELECTION */}
         {currentStep === 1 && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
-            <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <Sparkles size={18} className="text-luxury-gold" /> Step 1: Select Category & Package
-            </h2>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Category</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCategory(cat.id);
-                      setSelectedPackage(null);
-                    }}
-                    className={`p-4 rounded-2xl border text-left transition-all ${
-                      selectedCategory === cat.id 
-                        ? 'border-luxury-gold bg-luxury-cream ring-2 ring-luxury-gold/50' 
-                        : 'border-gray-200 hover:border-luxury-rosegold'
-                    }`}
-                  >
-                    <h3 className="font-bold text-sm text-luxury-black">{cat.name}</h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{cat.description}</p>
-                  </button>
-                ))}
-              </div>
+          <div className="package-picker-v3">
+            <div className="package-cards-v3">
+              {(categories.find(c => c.id === selectedCategory) || categories[0])?.packages.slice(0,3).map((pkg, index) => (
+                <button key={pkg.id} type="button" onClick={() => { setSelectedCategory(pkg.category || categories.find(c => c.packages.some(p => p.id === pkg.id))?.id); setSelectedPackage(pkg); }} className={`package-card-v3 ${selectedPackage?.id === pkg.id ? 'is-selected' : ''}`}>
+                  <div><h2>{index === 0 ? 'Bride & Matron (Studio)' : index === 1 ? 'Bride & Matron (Field without Touch-ups)' : 'Bride & Matron (Field with Touch-ups)'}</h2><strong>{Number(pkg.price).toLocaleString()} Rwf</strong><ul><li>Full makeup</li><li>Lashes</li>{index !== 1 && <li>{index === 2 ? 'Touch-ups' : 'Basic touch-up'}</li>}{index === 2 && <li>Long lasting look</li>}</ul></div>
+                  <span className="package-radio">{selectedPackage?.id === pkg.id && '✓'}</span>{index === 2 && <em className="popular-leaf-v3"><span>Most Popular</span></em>}
+                </button>
+              ))}
             </div>
-
-            {selectedCategory && (
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Available Packages</label>
-                <div className="space-y-3">
-                  {categories.find(c => c.id === selectedCategory)?.packages.map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      onClick={() => setSelectedPackage(pkg)}
-                      className={`p-4 rounded-2xl border cursor-pointer transition-all flex justify-between items-center ${
-                        selectedPackage?.id === pkg.id 
-                          ? 'border-luxury-black bg-luxury-black text-white shadow-lg' 
-                          : 'border-gray-200 bg-white hover:border-luxury-gold'
-                      }`}
-                    >
-                      <div>
-                        <h4 className="font-bold text-sm">{pkg.name}</h4>
-                        <p className={`text-xs mt-1 ${selectedPackage?.id === pkg.id ? 'text-gray-300' : 'text-gray-500'}`}>
-                          Max {pkg.maximum_people} Person(s)
-                        </p>
-                      </div>
-                      <span className={`font-serif text-lg font-bold ${selectedPackage?.id === pkg.id ? 'text-luxury-gold' : 'text-luxury-black'}`}>
-                        {Number(pkg.price).toLocaleString()} Frw
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <button
-              disabled={!selectedPackage}
-              onClick={() => setCurrentStep(2)}
-              className="w-full bg-luxury-gold disabled:bg-gray-200 disabled:text-gray-400 hover:bg-luxury-rosegold text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-md"
-            >
-              Continue to Calendar <ArrowRight size={16} />
-            </button>
+            <button disabled={!selectedPackage} onClick={() => setCurrentStep(2)} className="package-continue-v3">Continue</button>
           </div>
         )}
 
         {/* STEP 2: CALENDAR & STARTING HOUR SELECTION */}
         {currentStep === 2 && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
-            <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <Calendar size={18} className="text-luxury-gold" /> Step 2: Select Date & Starting Hour
-            </h2>
+          <div className="booking-details-v3">
+            <label><span>Service</span><strong>{selectedPackage?.name || 'Bride & Matron (Field with Touch-ups)'}</strong></label>
+            <label><span>Date</span><input type="date" value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)} /></label>
+            <label><span>Time</span><input type="time" value={selectedTime} onChange={(e) => handleTimeInputChange(e.target.value)} /></label>
+            <label><span>Location</span><strong><MapPin /> Kigali, Rwanda</strong></label>
+            <label className="people-field"><span>Number of people</span><button type="button" onClick={() => setFormData(p => ({...p,number_of_people:Math.max(1,p.number_of_people-1)}))}><Minus /></button><b>{formData.number_of_people}</b><button type="button" onClick={() => setFormData(p => ({...p,number_of_people:p.number_of_people+1}))}><Plus /></button></label>
+            <label><span>Touch-up needed?</span><select><option>Yes</option><option>No</option></select></label>
 
-            {/* Interactive Calendar Component */}
-            <CalendarPicker
-              selectedDate={appointmentDate}
-              onSelectDate={(date) => setAppointmentDate(date)}
-              fullBlockedDates={fullBlockedDates}
-              partiallyBlockedDates={partiallyBlockedDates}
-            />
-
+            <div className="booking-details-feedback">
             {checkingSlots && (
               <div className="flex items-center justify-center gap-2 text-xs text-luxury-gold font-medium py-4">
                 <Loader2 className="animate-spin" size={16} /> Loading studio schedule for {appointmentDate}...
@@ -391,300 +384,32 @@ export default function BookingPage() {
               </div>
             )}
 
-            {!checkingSlots && appointmentDate && !slotError && (
-              <div className="space-y-6 pt-2">
-                
-                {/* 1. VISUAL PROPORTIONAL WORKING HOURS TIMELINE BAR */}
-                <div className="bg-luxury-cream p-5 rounded-3xl border border-luxury-nude space-y-3">
-                  <div className="flex justify-between items-center text-xs font-bold text-luxury-black">
-                    <span className="uppercase tracking-wider">Working Hours Overview</span>
-                    <span className="font-mono text-gray-500">{openingTime} - {closingTime}</span>
-                  </div>
-
-                  {/* Multi-Color Timeline Bar */}
-                  <div className="w-full h-8 bg-gray-200 rounded-2xl overflow-hidden flex shadow-inner p-1 gap-1">
-                    {timelineSegments.map((seg, idx) => (
-                      <div
-                        key={idx}
-                        style={{ width: `${seg.width_percent}%` }}
-                        title={`${seg.label} (${seg.reason})`}
-                        className={`h-full rounded-xl transition-all flex items-center justify-center text-[10px] font-bold text-white font-mono px-1 overflow-hidden truncate ${
-                          seg.type === 'available'
-                            ? 'bg-emerald-500 shadow-sm'
-                            : seg.type === 'blocked'
-                            ? 'bg-amber-400 text-amber-950 shadow-sm'
-                            : 'bg-red-800 shadow-sm'
-                        }`}
-                      >
-                        {seg.width_percent > 15 && seg.label}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex flex-wrap justify-center gap-4 text-[10px] pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded-md bg-emerald-500"></span>
-                      <span className="font-semibold text-gray-700">Available Hours</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded-md bg-amber-400"></span>
-                      <span className="font-semibold text-gray-700">Blocked / Studio Break</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded-md bg-red-800"></span>
-                      <span className="font-semibold text-gray-700">Booked</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. FORM STARTING HOUR INPUT FIELD */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-200 space-y-4 shadow-sm">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-luxury-black mb-1.5">
-                      Enter Desired Starting Hour *
-                    </label>
-
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="time"
-                        required
-                        value={selectedTime}
-                        onChange={(e) => handleTimeInputChange(e.target.value)}
-                        className="p-3 border border-gray-300 rounded-xl text-sm font-bold font-mono focus:ring-2 focus:ring-luxury-gold focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  {/* RESTRICTED HOUR CONFLICT WARNING */}
-                  {overlapWarning && (
-                    <div className="p-4 bg-amber-50 text-amber-900 border border-amber-300 rounded-2xl text-xs flex items-start gap-2.5">
-                      <AlertTriangle size={18} className="shrink-0 text-amber-600 mt-0.5" />
-                      <div>
-                        <strong className="block font-bold">Time Restricted</strong>
-                        <span>{overlapWarning}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {!overlapWarning && selectedTime && (
-                    <div className="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs flex items-center gap-2">
-                      <CheckCircle2 size={16} className="text-emerald-600" />
-                      <span>This starting time is available.</span>
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            )}
-
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                onClick={() => setCurrentStep(1)}
-                className="w-1/3 bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-1"
-              >
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button
-                type="button"
-                disabled={!selectedTime || !!overlapWarning}
-                onClick={() => setCurrentStep(3)}
-                className="w-2/3 bg-luxury-gold disabled:bg-gray-200 disabled:text-gray-400 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
-              >
-                Continue to Personal Info <ArrowRight size={16} />
-              </button>
+            {overlapWarning && <div className="p-3 bg-amber-50 text-amber-900 text-xs">{overlapWarning}</div>}
             </div>
+
+            <button type="button" disabled={!appointmentDate || !selectedTime || !!overlapWarning} onClick={() => setCurrentStep(3)} className="details-continue-v3">Continue</button>
           </div>
         )}
 
         {/* STEP 3: PERSONAL DETAILS */}
         {currentStep === 3 && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-5">
-            <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <User size={18} className="text-luxury-gold" /> Step 3: Your Personal Information
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  name="client_name"
-                  required
-                  value={formData.client_name}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Keza Alice"
-                  className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">WhatsApp Number *</label>
-                <input
-                  type="text"
-                  name="whatsapp_number"
-                  required
-                  value={formData.whatsapp_number}
-                  onChange={handleInputChange}
-                  placeholder="+250788123456"
-                  className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Alternative Phone (Optional)</label>
-                <input
-                  type="text"
-                  name="alternative_phone"
-                  value={formData.alternative_phone}
-                  onChange={handleInputChange}
-                  placeholder="+250..."
-                  className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Email Address (Optional)</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="keza@example.com"
-                  className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-                />
-              </div>
+          <div className="booking-info-form bg-white">
+            <div className="booking-info-fields">
+              <label className="booking-info-field"><span>Full Name</span><input type="text" name="client_name" required value={formData.client_name} onChange={handleInputChange} placeholder="Enter your full name" /></label>
+              <label className="booking-info-field"><span>Phone Number</span><input type="text" name="whatsapp_number" required value={formData.whatsapp_number} onChange={handleInputChange} placeholder="+250 7XX XXX XXX" /></label>
+              <label className="booking-info-field"><span>Email Address</span><input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="youremail@example.com" /></label>
+              <label className="booking-info-field"><span>Event Location</span><input type="text" name="field_location" value={formData.field_location} onChange={(event) => setFormData((previous) => ({ ...previous, field_location: event.target.value, appointment_location_type: event.target.value ? 'venue' : 'studio' }))} placeholder="Enter event location" /></label>
+              <label className="booking-info-field booking-info-request"><span>Special Requests (optional)</span><textarea name="special_request" rows={4} value={formData.special_request} onChange={handleInputChange} placeholder="Write your request here..." /></label>
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Service Location *</label>
-              <select
-                name="appointment_location_type"
-                value={formData.appointment_location_type}
-                onChange={handleInputChange}
-                className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold bg-white"
-              >
-                <option value="studio">Studio (Kigali)</option>
-                <option value="home_service">Home Service</option>
-                <option value="venue">Venue / On-Location</option>
-              </select>
-            </div>
-
-            {formData.appointment_location_type !== 'studio' && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Field Address / Location Details *</label>
-                <textarea
-                  name="field_location"
-                  rows={2}
-                  value={formData.field_location}
-                  onChange={handleInputChange}
-                  placeholder="Hotel name, neighborhood, house number, or landmark in Kigali"
-                  className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Special Requests / Makeup Notes</label>
-              <textarea
-                name="special_request"
-                rows={2}
-                value={formData.special_request}
-                onChange={handleInputChange}
-                placeholder="Preferred eyeshadow tones, skin allergies, or event specifics"
-                className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-              />
-            </div>
-
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                onClick={() => setCurrentStep(2)}
-                className="w-1/3 bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-1"
-              >
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button
-                type="button"
-                disabled={!formData.client_name || !formData.whatsapp_number}
-                onClick={() => setCurrentStep(4)}
-                className="w-2/3 bg-luxury-gold disabled:bg-gray-200 text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-2 shadow"
-              >
-                Continue to Payment <ArrowRight size={16} />
-              </button>
-            </div>
+            <button type="button" disabled={!formData.client_name || !formData.whatsapp_number} onClick={() => setCurrentStep(4)} className="booking-info-continue">Continue to Payment</button>
           </div>
         )}
 
         {/* STEP 4: PAYMENT & PROOF UPLOAD */}
         {currentStep === 4 && (
-          <form onSubmit={handleSubmitBooking} className="bg-white p-6 sm:p-8 rounded-3xl border border-luxury-nude shadow-sm space-y-6">
-            <h2 className="font-serif text-xl font-bold text-luxury-black flex items-center gap-2">
-              <CreditCard size={18} className="text-luxury-gold" /> Step 4: Deposit Payment & Proof Upload
-            </h2>
-
-            <div className="bg-luxury-cream p-4 rounded-2xl border border-luxury-nude text-xs space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Selected Package:</span>
-                <span className="font-bold text-luxury-black">{selectedPackage?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Total Price:</span>
-                <span className="font-bold text-luxury-black">{Number(selectedPackage?.price).toLocaleString()} Frw</span>
-              </div>
-              <div className="flex justify-between border-t border-luxury-nude pt-2">
-                <span className="text-gray-500">Required Deposit (Approx 30%):</span>
-                <span className="font-bold text-luxury-gold text-sm">
-                  {Number(selectedPackage?.price * 0.3).toLocaleString()} Frw
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Select Payment Option</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {paymentMethods.map((method) => (
-                  <div
-                    key={method.id}
-                    onClick={() => setFormData(prev => ({ ...prev, payment_method: method.id }))}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                      formData.payment_method === method.id 
-                        ? 'border-luxury-gold bg-luxury-cream ring-2 ring-luxury-gold/50' 
-                        : 'border-gray-200 hover:border-luxury-rosegold'
-                    }`}
-                  >
-                    <h4 className="font-bold text-xs text-luxury-black">{method.name}</h4>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{method.account_name} ({method.account_number})</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Amount Deposited (Frw)</label>
-              <input
-                type="number"
-                name="amount_paid"
-                value={formData.amount_paid}
-                onChange={handleInputChange}
-                placeholder={`e.g. ${selectedPackage?.price * 0.3}`}
-                className="w-full p-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-luxury-gold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Upload Payment Slip / Screenshot Proof</label>
-              <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl text-center hover:border-luxury-gold transition-colors">
-                <Upload size={24} className="mx-auto text-gray-400 mb-1" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-luxury-black file:text-white hover:file:bg-luxury-gold"
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmitBooking} className="payment-v3">
+            <div className="payment-summary-v3"><h2>Booking Summary</h2><p><span>Package Price</span><b>{Number(selectedPackage?.price || 0).toLocaleString()} Rwf</b></p><p><span>Number of people</span><b>{formData.number_of_people}</b></p><hr/><p className="total"><span>Total Price</span><b>{Number(selectedPackage?.price || 0).toLocaleString()} Rwf</b></p><p className="deposit"><span>Deposit (50%)</span><b>{Number((selectedPackage?.price || 0) * .5).toLocaleString()} Rwf</b></p></div>
+            <div className="payment-methods-v3"><h3>Choose Payment Method</h3>{[...paymentMethods,{id:'cash',name:'Cash'}].slice(0,3).map((method,index)=>{const Icon=index===0?Smartphone:index===1?Landmark:Banknote;return <button type="button" key={method.id} onClick={()=>setFormData(p=>({...p,payment_method:method.id}))} className={formData.payment_method===method.id?'is-selected':''}><Icon/><span>{index===0?'Mobile Money':method.name}</span><i>{formData.payment_method===method.id?'✓':''}</i></button>})}</div>
 
             {submitError && (
               <div className="p-3.5 bg-red-50 text-red-700 text-xs rounded-xl flex items-center gap-2 border border-red-200">
@@ -692,86 +417,28 @@ export default function BookingPage() {
               </div>
             )}
 
-            <div className="flex gap-4 pt-4">
-              <button
-                type="button"
-                onClick={() => setCurrentStep(3)}
-                className="w-1/3 bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl flex items-center justify-center gap-1"
-              >
-                <ArrowLeft size={16} /> Back
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-2/3 bg-luxury-black hover:bg-luxury-gold text-white hover:text-luxury-black font-semibold text-xs uppercase tracking-wider py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={16} /> Submitting Booking...
-                  </>
-                ) : (
-                  <>
-                    Complete Booking Request <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
-            </div>
+            <button type="submit" disabled={submitting || !formData.payment_method} className="payment-submit-v3">{submitting?'Submitting Booking...':`Pay Deposit (${Number((selectedPackage?.price || 0)*.5).toLocaleString()} Rwf)`}</button>
           </form>
         )}
 
         {/* STEP 5: SUCCESS CONFIRMATION CARD */}
         {currentStep === 5 && createdAppointment && (
-          <div className="bg-white p-8 rounded-3xl border border-luxury-gold/50 shadow-2xl text-center space-y-6">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle2 size={36} />
+          <div className="booking-success-v3">
+            <div className="success-confetti-v3"></div>
+            <div className="success-check-v3"><CheckCircle2 /></div>
+            <h1>Booking <span>Confirmed!</span></h1>
+            <p>Thank you! Your appointment<br/>has been successfully booked.</p>
+            <div className="success-details-v3">
+              <div><ClipboardList/><span>Service</span><strong>{createdAppointment.package_name_snapshot}</strong></div>
+              <div><CalendarDays/><span>Date</span><strong>{new Date(`${createdAppointment.appointment_date}T00:00:00`).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</strong></div>
+              <div><Clock3/><span>Time</span><strong>{new Date(`2000-01-01T${createdAppointment.start_time}`).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</strong></div>
+              <div><MapPin/><span>Location</span><strong>{createdAppointment.field_location || 'Kigali, Rwanda'}</strong></div>
+              <div><UsersRound/><span>Guests</span><strong>{createdAppointment.number_of_people} {createdAppointment.number_of_people === 1 ? 'Person' : 'People'}</strong></div>
+              <div className="success-booking-id"><ClipboardList/><span>Booking ID</span><strong>{createdAppointment.appointment_id}</strong><button type="button" onClick={copyBookingId} aria-label="Copy booking ID"><Copy/><i>{bookingIdCopied ? 'Copied' : 'Copy'}</i></button></div>
             </div>
-
-            <div>
-              <span className="text-luxury-gold uppercase text-xs tracking-widest font-bold">Booking Submitted</span>
-              <h2 className="font-serif text-3xl font-bold text-luxury-black mt-1">Thank You, {createdAppointment.client_name}!</h2>
-              <p className="text-gray-600 text-xs mt-2">
-                Your appointment request has been logged. Click below to open WhatsApp and send your confirmation code for rapid verification.
-              </p>
-            </div>
-
-            <div className="bg-luxury-cream p-5 rounded-2xl border border-luxury-nude text-left max-w-md mx-auto space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Appointment ID:</span>
-                <span className="font-bold text-luxury-black font-mono">{createdAppointment.appointment_id}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Package:</span>
-                <span className="font-bold text-luxury-black">{createdAppointment.package_name_snapshot}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Date & Time:</span>
-                <span className="font-bold text-luxury-black">{createdAppointment.appointment_date} at {createdAppointment.start_time}</span>
-              </div>
-              <div className="flex justify-between border-t border-luxury-nude pt-2">
-                <span className="text-gray-500">Remaining Balance:</span>
-                <span className="font-bold text-luxury-gold">{Number(createdAppointment.remaining_balance).toLocaleString()} Frw</span>
-              </div>
-            </div>
-
-            {createdAppointment.whatsapp_url && (
-              <a
-                href={createdAppointment.whatsapp_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider px-8 py-4 rounded-2xl transition-all shadow-lg hover:scale-105"
-              >
-                <MessageCircle size={18} /> Confirm via WhatsApp Now
-              </a>
-            )}
-
-            <div className="pt-4 border-t border-gray-100">
-              <button
-                onClick={() => navigate('/')}
-                className="text-xs text-gray-500 hover:text-luxury-black underline font-medium"
-              >
-                Return to Homepage
-              </button>
-            </div>
+            <button type="button" className="success-calendar-v3" onClick={addBookingToCalendar}><CalendarDays/> Add to Calendar</button>
+            <a className="success-whatsapp-v3" href={confirmationWhatsAppUrl} target="_blank" rel="noopener noreferrer"><MessageCircle/> Confirm on WhatsApp</a>
+            <button type="button" className="success-home-v3" onClick={() => navigate('/')}>Back to Home</button>
           </div>
         )}
 

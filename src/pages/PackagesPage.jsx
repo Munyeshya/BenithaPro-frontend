@@ -1,26 +1,26 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
-import { demoCategories } from '../data/demoData';
-import bridal from '../assets/makeup-bridal.webp';
-import normal from '../assets/makeup-soft-glam.webp';
-import group from '../assets/makeup-evening-glam.webp';
+import bridal from '../assets/service-bridal-v3.png';
+import normal from '../assets/service-normal-v3.png';
+import group from '../assets/service-group-v3.png';
 
-const fallbackImages = [bridal, normal, group];
+const services = [
+  { id: 1, title: 'Bridal makeup', description: 'For your most unforgettable day.', image: bridal },
+  { id: 2, title: 'Normal makeup', description: 'For parties, events, photoshoots and special occasions.', image: normal },
+  { id: 3, title: 'Group makeup', description: 'For bridesmaids, friends and events.', image: group },
+];
 
 export default function PackagesPage() {
-  const [categories, setCategories] = useState([]); const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  useEffect(() => { API.get('/categories-packages/').then(r => setCategories(r.data)).catch(() => setCategories(demoCategories)).finally(() => setLoading(false)); }, []);
-  return <div className="figma-page figma-services-page">
-    <button className="figma-back" onClick={() => navigate(-1)}><ArrowLeft size={22}/></button>
-    <header><h1>Our services</h1><p>Choose the service that<br/>best suits your needs.</p></header>
-    {loading ? <Loader2 className="mx-auto animate-spin text-[#c9952e]"/> : <div className="figma-category-list">
-      {categories.map((cat, index) => <article key={cat.id}>
-        <div><h2>{cat.name}</h2><p>{cat.description}</p><button onClick={() => navigate(`/book?category=${cat.id}`)}>View packages <ArrowRight size={13}/></button></div>
-        <img src={cat.packages?.[0]?.images?.[0]?.image || fallbackImages[index % 3]} alt={cat.name}/>
+  return <div className="services-v3-page">
+    <header className="services-v3-header">
+      <h1>Our <em>Services</em></h1><span></span><p>Choose the service that<br/>best suits your needs</p>
+    </header>
+    <div className="services-v3-list">
+      {services.map(service => <article className="services-v3-card" key={service.id}>
+        <img src={service.image} alt={service.title}/><div className="services-v3-blend"></div>
+        <div className="services-v3-copy"><h2>{service.title}</h2><p>{service.description}</p><button onClick={() => navigate(`/book?category=${service.id}`)}>View packages <ArrowRight size={19}/></button></div>
       </article>)}
-    </div>}
+    </div>
   </div>;
 }

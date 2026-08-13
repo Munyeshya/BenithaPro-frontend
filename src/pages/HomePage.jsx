@@ -4,6 +4,7 @@ import hero from '../assets/home-hero-v3.png';
 import bridal from '../assets/makeup-bridal.webp';
 import normal from '../assets/makeup-soft-glam.webp';
 import group from '../assets/makeup-evening-glam.webp';
+import AppointmentTracker from '../components/AppointmentTracker';
 
 const services = [
   { name: 'Bridal makeup', icon: UserRound, image: bridal, copy: 'For your most unforgettable day.' },
@@ -41,5 +42,6 @@ export default function HomePage() {
       <header><small>Our expertise</small><h2>Beauty for every moment.</h2></header>
       <div>{services.map(service => <article key={service.name}><img src={service.image} alt=""/><div><small>BENITHA MAKEUP PRO</small><h3>{service.name}</h3><p>{service.copy}</p><Link to="/packages">View packages <ArrowRight size={15}/></Link></div></article>)}</div>
     </section>
+    <AppointmentTracker />
   </div>;
 }

@@ -2,10 +2,9 @@ import axios from 'axios';
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
-  timeout: 3500,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Booking creation can take longer while Django saves the appointment and
+  // prepares its WhatsApp confirmation. Avoid aborting a successful request.
+  timeout: 30000,
 });
 
 // Interceptor to attach JWT token for Admin Requests
